@@ -114,6 +114,8 @@ def _ensure_requirements(requirements_path):
 
 def main():
     local_version = _extract_version(_read_text(LOCAL_APP_MAIN))
+    latest_main = os.path.join(LATEST_DIR, "main.py")
+    latest_version = _extract_version(_read_text(latest_main))
     remote_main, branch = _get_remote_main_and_branch()
     remote_version = _extract_version(remote_main)
 
@@ -121,18 +123,21 @@ def main():
         print("No se pudo leer la version remota.")
         return
 
-    if _is_remote_newer(remote_version, local_version) or remote_version != local_version:
+    current_version = latest_version or local_version
+    if not latest_version:
+        print("No existe latest, descargando...")
+        _download_latest_app(branch)
+        _ensure_requirements(os.path.join(LATEST_DIR, "requirements.txt"))
+        _run_main(os.path.join(LATEST_DIR, "main.py"))
+        return
+
+    if _is_remote_newer(remote_version, current_version):
         print(f"Actualizando a la version {remote_version} desde {branch}...")
         _download_latest_app(branch)
         _ensure_requirements(os.path.join(LATEST_DIR, "requirements.txt"))
         _run_main(os.path.join(LATEST_DIR, "main.py"))
         return
 
-    latest_main = os.path.join(LATEST_DIR, "main.py")
-    if not os.path.isfile(latest_main):
-        print("No existe latest, descargando...")
-        _download_latest_app(branch)
-        latest_main = os.path.join(LATEST_DIR, "main.py")
     _ensure_requirements(os.path.join(LATEST_DIR, "requirements.txt"))
     _run_main(latest_main)
 
