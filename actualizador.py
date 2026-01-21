@@ -4,6 +4,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import urllib.request
 import zipfile
 
@@ -53,18 +54,31 @@ def _is_remote_newer(remote, local):
 
 
 def _fetch_url(url):
-    with urllib.request.urlopen(url, timeout=20) as resp:
+    cache_buster = int(time.time())
+    sep = "&" if "?" in url else "?"
+    request = urllib.request.Request(
+        f"{url}{sep}t={cache_buster}",
+        headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+    )
+    with urllib.request.urlopen(request, timeout=20) as resp:
         return resp.read()
 
 
 def _get_remote_main_and_branch():
+    candidates = []
     for branch in BRANCHES:
         url = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{branch}/app/main.py"
         try:
-            return _fetch_url(url).decode("utf-8", errors="replace"), branch
+            text = _fetch_url(url).decode("utf-8", errors="replace")
         except Exception:
             continue
-    return "", ""
+        version = _extract_version(text)
+        if version:
+            candidates.append((version, text, branch))
+    if not candidates:
+        return "", ""
+    candidates.sort(key=lambda item: _version_tuple(item[0]) or (-1,))
+    return candidates[-1][1], candidates[-1][2]
 
 
 def _download_latest_app(branch):
@@ -113,6 +127,7 @@ def _ensure_requirements(requirements_path):
 
 
 def main():
+    print("Buscando nueva version...")
     latest_main = os.path.join(LATEST_DIR, "main.py")
     latest_version = _extract_version(_read_text(latest_main))
     remote_main, branch = _get_remote_main_and_branch()
@@ -122,20 +137,23 @@ def main():
         print("No se pudo leer la version remota.")
         return
 
+    print(f"La version en git es {remote_version} ({branch}).")
+    print(f"La version local es {latest_version or 'no disponible'}.")
     if not latest_version:
-        print("No existe latest o no tiene version, descargando...")
+        print("No existe latest o no tiene version, descargo la nueva version.")
         _download_latest_app(branch)
         _ensure_requirements(os.path.join(LATEST_DIR, "requirements.txt"))
         _run_main(os.path.join(LATEST_DIR, "main.py"))
         return
 
     if _is_remote_newer(remote_version, latest_version):
-        print(f"Actualizando a la version {remote_version} desde {branch}...")
+        print(f"Descargo la nueva version {remote_version} desde {branch}...")
         _download_latest_app(branch)
         _ensure_requirements(os.path.join(LATEST_DIR, "requirements.txt"))
         _run_main(os.path.join(LATEST_DIR, "main.py"))
         return
 
+    print("Ya esta actualizada.")
     _ensure_requirements(os.path.join(LATEST_DIR, "requirements.txt"))
     _run_main(latest_main)
 
