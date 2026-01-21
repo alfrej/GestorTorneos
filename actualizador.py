@@ -9,6 +9,12 @@ import base64
 import time
 import urllib.request
 import zipfile
+import ssl
+
+try:
+    import certifi
+except Exception:
+    certifi = None
 
 
 REPO_OWNER = "alfrej"
@@ -55,19 +61,36 @@ def _is_remote_newer(remote, local):
     return True
 
 
+def _build_ssl_context():
+    if os.environ.get("GTR_DISABLE_SSL_VERIFY") == "1":
+        return ssl._create_unverified_context()
+    if certifi:
+        return ssl.create_default_context(cafile=certifi.where())
+    return ssl.create_default_context()
+
+
 def _fetch_url(url):
     cache_buster = int(time.time())
     sep = "&" if "?" in url else "?"
+    headers = {
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+        "User-Agent": "GestorTorneosUpdater/1.0",
+    }
+    if "api.github.com" in url:
+        headers["Accept"] = "application/vnd.github+json"
     request = urllib.request.Request(
         f"{url}{sep}t={cache_buster}",
-        headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+        headers=headers,
     )
-    with urllib.request.urlopen(request, timeout=20) as resp:
+    context = _build_ssl_context()
+    with urllib.request.urlopen(request, timeout=20, context=context) as resp:
         return resp.read()
 
 
 def _get_remote_main_and_branch():
     candidates = []
+    last_error = ""
     for branch in BRANCHES:
         text = ""
         api_url = (
@@ -80,21 +103,27 @@ def _get_remote_main_and_branch():
             content = data.get("content", "")
             if content:
                 text = base64.b64decode(content).decode("utf-8", errors="replace")
+            else:
+                message = data.get("message")
+                if message:
+                    last_error = f"GitHub API: {message}"
         except Exception:
             text = ""
+            last_error = "No se pudo acceder a GitHub API."
         if not text:
             url = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{branch}/app/main.py"
             try:
                 text = _fetch_url(url).decode("utf-8", errors="replace")
             except Exception:
+                last_error = "No se pudo acceder a raw.githubusercontent.com."
                 continue
         version = _extract_version(text)
         if version:
             candidates.append((version, text, branch))
     if not candidates:
-        return "", ""
+        return "", "", last_error
     candidates.sort(key=lambda item: _version_tuple(item[0]) or (-1,))
-    return candidates[-1][1], candidates[-1][2]
+    return candidates[-1][1], candidates[-1][2], ""
 
 
 def _download_latest_app(branch):
@@ -155,11 +184,13 @@ def main():
     print("Buscando nueva version...")
     latest_main = os.path.join(LATEST_DIR, "main.py")
     latest_version = _extract_version(_read_text(latest_main))
-    remote_main, branch = _get_remote_main_and_branch()
+    remote_main, branch, error_detail = _get_remote_main_and_branch()
     remote_version = _extract_version(remote_main)
 
     if not remote_version:
         print("No se pudo leer la version remota.")
+        if error_detail:
+            print(f"Detalle: {error_detail}")
         return
 
     print(f"La version en git es {remote_version} ({branch}).")
