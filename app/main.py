@@ -310,7 +310,6 @@ def start_gui():
         fg=TEXT_COLOR,
     )
     title.pack(pady=(0, 20))
-
     qr_image = create_qr_image(url)
     qr_label = tk.Label(qr_frame, image=qr_image, bg=CARD_BG)
     qr_label.image = qr_image
@@ -328,6 +327,16 @@ def start_gui():
     if logo_label is not None:
         logo_label.place(relx=1.0, rely=1.0, anchor="se", x=-20, y=-20)
         logo_label.lower(qr_frame)
+
+    version_label = tk.Label(
+        container,
+        text=f"Version {__version__}",
+        font=("Helvetica", 11),
+        bg=BG_MAIN,
+        fg="#6B7A80",
+    )
+    version_label.place(relx=0.0, rely=1.0, anchor="sw", x=14, y=-8)
+    version_label.lift()
 
     dashboard_frame = tk.Frame(container, bg=BG_MAIN)
     dashboard_frame.pack(expand=True, fill="both")
