@@ -1,9 +1,11 @@
 import io
+import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import base64
 import time
 import urllib.request
 import zipfile
@@ -67,11 +69,25 @@ def _fetch_url(url):
 def _get_remote_main_and_branch():
     candidates = []
     for branch in BRANCHES:
-        url = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{branch}/app/main.py"
+        text = ""
+        api_url = (
+            f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/app/main.py"
+            f"?ref={branch}"
+        )
         try:
-            text = _fetch_url(url).decode("utf-8", errors="replace")
+            payload = _fetch_url(api_url).decode("utf-8", errors="replace")
+            data = json.loads(payload)
+            content = data.get("content", "")
+            if content:
+                text = base64.b64decode(content).decode("utf-8", errors="replace")
         except Exception:
-            continue
+            text = ""
+        if not text:
+            url = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{branch}/app/main.py"
+            try:
+                text = _fetch_url(url).decode("utf-8", errors="replace")
+            except Exception:
+                continue
         version = _extract_version(text)
         if version:
             candidates.append((version, text, branch))

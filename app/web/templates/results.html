@@ -29,10 +29,23 @@
         padding: 36px 0 60px;
       }
       h1 {
-        margin: 0 0 20px;
-        font-size: clamp(28px, 4vw, 40px);
+        margin: 8px 0 20px;
+        font-size: clamp(24px, 4vw, 36px);
         letter-spacing: 1px;
+        line-height: 1.1;
         text-align: center;
+      }
+      .tournament-name {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 40px);
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        text-align: center;
+        color: #33454d;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       .header {
         display: grid;
@@ -52,6 +65,7 @@
         background: var(--accent);
         color: #fff;
         font-size: 18px;
+        line-height: 1;
         transition: transform 0.2s ease, background 0.2s ease;
       }
       .home:hover {
@@ -72,6 +86,7 @@
         background: var(--accent);
         color: #fff;
         font-size: 18px;
+        line-height: 1;
         transition: transform 0.2s ease, background 0.2s ease;
       }
       .ranking:hover {
@@ -159,9 +174,10 @@
     <main class="page">
       <div class="header">
         <a class="home" href="/" aria-label="Inicio">🏠</a>
-        <h1>Resultados</h1>
+        <div class="tournament-name">{{ tournament.name }}</div>
         <a class="ranking" href="/clasificacion" aria-label="Ver clasificación">🏆</a>
       </div>
+      <h1>Resultados</h1>
       <div id="results"></div>
     </main>
     <script>
