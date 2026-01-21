@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 import qrcode
 from flask import Flask, jsonify, render_template, request
 
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 
 WEB_PORT = 5050
 TOURNAMENTS_DIR = os.path.join(os.path.dirname(__file__), "Torneos")
@@ -54,6 +54,15 @@ def slugify_name(name):
     )
     cleaned = "-".join(filter(None, cleaned.split("-")))
     return cleaned.lower()
+
+
+def validate_filename(name):
+    invalid_chars = '<>:"/\\|?*'
+    if not name or name in (".", ".."):
+        return False
+    if name.endswith(" ") or name.endswith("."):
+        return False
+    return not any(ch in invalid_chars for ch in name)
 
 
 def get_local_ip():
@@ -120,22 +129,19 @@ def start_web_server():
         if not payload:
             return jsonify({"error": "Payload invalido"}), 400
 
-        requested_name = payload.get("name", "")
-        base_name = slugify_name(requested_name)
-        if not base_name:
-            base_name = datetime.now().strftime("%Y%m%d%H%M%S")
-        tournament_id = base_name
+        requested_name = payload.get("name", "").strip()
+        if not requested_name:
+            requested_name = datetime.now().strftime("%Y%m%d%H%M%S")
+        if not validate_filename(requested_name):
+            return jsonify({"error": "Nombre de torneo invalido"}), 400
+        tournament_id = requested_name
         os.makedirs(TOURNAMENTS_DIR, exist_ok=True)
         path = os.path.join(TOURNAMENTS_DIR, f"{tournament_id}.json")
-        if os.path.exists(path) and requested_name.strip():
-            return jsonify({"error": "Nombre de torneo existente"}), 409
         if os.path.exists(path):
-            suffix = datetime.now().strftime("%Y%m%d%H%M%S")
-            tournament_id = f"{base_name}-{suffix}"
-            path = os.path.join(TOURNAMENTS_DIR, f"{tournament_id}.json")
+            return jsonify({"error": "Nombre de torneo existente"}), 409
         data = {
             "id": tournament_id,
-            "name": requested_name.strip(),
+            "name": requested_name,
             "rounds_count": payload.get("rounds_count"),
             "courts": payload.get("courts"),
             "players": payload.get("players", []),
@@ -148,11 +154,12 @@ def start_web_server():
 
     @app.route("/api/tournaments/exists")
     def tournament_exists():
-        name = request.args.get("name", "")
-        base_name = slugify_name(name)
-        if not base_name:
+        name = request.args.get("name", "").strip()
+        if not name:
             return jsonify({"exists": False})
-        path = os.path.join(TOURNAMENTS_DIR, f"{base_name}.json")
+        if not validate_filename(name):
+            return jsonify({"exists": False})
+        path = os.path.join(TOURNAMENTS_DIR, f"{name}.json")
         return jsonify({"exists": os.path.exists(path)})
 
     @app.route("/api/ping")
