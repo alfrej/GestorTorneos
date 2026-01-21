@@ -95,13 +95,22 @@ def _download_latest_app(branch):
         raise RuntimeError("No se encontro app/main.py en el zip del repositorio.")
 
     if os.path.isdir(LATEST_DIR):
-        shutil.rmtree(LATEST_DIR)
+        for name in os.listdir(LATEST_DIR):
+            if name.lower() == "torneos":
+                continue
+            path = os.path.join(LATEST_DIR, name)
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
     os.makedirs(LATEST_DIR, exist_ok=True)
 
     for name in zf.namelist():
         if not name.startswith(app_prefix + "app/"):
             continue
         rel_path = name[len(app_prefix + "app/") :]
+        if rel_path.startswith("Torneos/") or rel_path == "Torneos":
+            continue
         if not rel_path:
             continue
         dest_path = os.path.join(LATEST_DIR, rel_path)
