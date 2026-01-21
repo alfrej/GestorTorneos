@@ -1,0 +1,523 @@
+{
+  "id": "real",
+  "name": "Real",
+  "rounds_count": 12,
+  "courts": 2,
+  "players": [
+    "juan",
+    "alberto",
+    "sara",
+    "miriam",
+    "tito rey",
+    "tito puente",
+    "juanjo",
+    "alfredo",
+    "salomé"
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "salomé",
+              "miriam"
+            ],
+            [
+              "alberto",
+              "juan"
+            ]
+          ],
+          "result": {
+            "teamA": 10,
+            "teamB": 1
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "sara",
+              "tito puente"
+            ],
+            [
+              "tito rey",
+              "juanjo"
+            ]
+          ],
+          "result": {
+            "teamA": 9,
+            "teamB": 1
+          }
+        }
+      ],
+      "bench": [
+        "alfredo"
+      ]
+    },
+    {
+      "index": 1,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "juanjo",
+              "alberto"
+            ],
+            [
+              "alfredo",
+              "tito rey"
+            ]
+          ],
+          "result": {
+            "teamA": 1,
+            "teamB": 3
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "tito puente",
+              "juan"
+            ],
+            [
+              "miriam",
+              "sara"
+            ]
+          ],
+          "result": {
+            "teamA": 1,
+            "teamB": 10
+          }
+        }
+      ],
+      "bench": [
+        "salomé"
+      ]
+    },
+    {
+      "index": 2,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "sara",
+              "alberto"
+            ],
+            [
+              "juanjo",
+              "juan"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "salomé",
+              "alfredo"
+            ],
+            [
+              "miriam",
+              "tito rey"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "tito puente"
+      ]
+    },
+    {
+      "index": 3,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "juan",
+              "salomé"
+            ],
+            [
+              "sara",
+              "tito rey"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "alberto",
+              "tito puente"
+            ],
+            [
+              "miriam",
+              "alfredo"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "juanjo"
+      ]
+    },
+    {
+      "index": 4,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "salomé",
+              "sara"
+            ],
+            [
+              "alberto",
+              "miriam"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "juan",
+              "alfredo"
+            ],
+            [
+              "tito puente",
+              "juanjo"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "tito rey"
+      ]
+    },
+    {
+      "index": 5,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "alberto",
+              "salomé"
+            ],
+            [
+              "tito puente",
+              "tito rey"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "sara",
+              "juan"
+            ],
+            [
+              "juanjo",
+              "alfredo"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "miriam"
+      ]
+    },
+    {
+      "index": 6,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "tito rey",
+              "juan"
+            ],
+            [
+              "salomé",
+              "tito puente"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "juanjo",
+              "miriam"
+            ],
+            [
+              "alfredo",
+              "sara"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "alberto"
+      ]
+    },
+    {
+      "index": 7,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "tito rey",
+              "salomé"
+            ],
+            [
+              "alfredo",
+              "alberto"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "juanjo",
+              "sara"
+            ],
+            [
+              "miriam",
+              "tito puente"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "juan"
+      ]
+    },
+    {
+      "index": 8,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "tito puente",
+              "juanjo"
+            ],
+            [
+              "alberto",
+              "tito rey"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "alfredo",
+              "salomé"
+            ],
+            [
+              "juan",
+              "miriam"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "sara"
+      ]
+    },
+    {
+      "index": 9,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "tito puente",
+              "alfredo"
+            ],
+            [
+              "sara",
+              "tito rey"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "salomé",
+              "juanjo"
+            ],
+            [
+              "juan",
+              "alberto"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "miriam"
+      ]
+    },
+    {
+      "index": 10,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "tito puente",
+              "salomé"
+            ],
+            [
+              "sara",
+              "alfredo"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "alberto",
+              "miriam"
+            ],
+            [
+              "juan",
+              "tito rey"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "juanjo"
+      ]
+    },
+    {
+      "index": 11,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "alfredo",
+              "alberto"
+            ],
+            [
+              "juan",
+              "sara"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "miriam",
+              "tito puente"
+            ],
+            [
+              "salomé",
+              "juanjo"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "tito rey"
+      ]
+    }
+  ]
+}

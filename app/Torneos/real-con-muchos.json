@@ -1,0 +1,1510 @@
+{
+  "id": "real-con-muchos",
+  "name": "Real con muchos",
+  "rounds_count": 20,
+  "courts": 2,
+  "players": [
+    "alfredo",
+    "juan",
+    "pepe",
+    "maria",
+    "lucas",
+    "flor",
+    "sebas",
+    "rey",
+    "juanjo",
+    "raul",
+    "feliciano",
+    "pinto",
+    "jose",
+    "pepe rey",
+    "josep",
+    "alberto",
+    "alvaro",
+    "zacarías",
+    "pedro",
+    "pedrito",
+    "manolo",
+    "manolito",
+    "juanito",
+    "francisco",
+    "grub",
+    "juana",
+    "mariana",
+    "paula",
+    "pilar",
+    "trini",
+    "encarna",
+    "pablo",
+    "pablito",
+    "marcos",
+    "marquitos",
+    "funesto",
+    "treviño",
+    "picas",
+    "anastasia",
+    "juan maria"
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "raul",
+              "jose"
+            ],
+            [
+              "pinto",
+              "feliciano"
+            ]
+          ],
+          "result": {
+            "teamA": 11,
+            "teamB": 1
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "juanjo",
+              "alfredo"
+            ],
+            [
+              "juan",
+              "pepe"
+            ]
+          ],
+          "result": {
+            "teamA": 10,
+            "teamB": 1
+          }
+        }
+      ],
+      "bench": [
+        "maria",
+        "lucas",
+        "pepe rey",
+        "josep",
+        "alberto",
+        "flor",
+        "sebas",
+        "rey",
+        "pedro",
+        "manolo",
+        "paula",
+        "mariana",
+        "encarna",
+        "juana",
+        "manolito",
+        "juanito",
+        "francisco",
+        "pedrito",
+        "grub",
+        "zacarías",
+        "alvaro",
+        "pilar",
+        "trini",
+        "pablo",
+        "marquitos",
+        "funesto",
+        "pablito",
+        "marcos",
+        "anastasia",
+        "picas",
+        "juan maria",
+        "treviño"
+      ]
+    },
+    {
+      "index": 1,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "funesto",
+              "pablito"
+            ],
+            [
+              "zacarías",
+              "marcos"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "marquitos",
+              "sebas"
+            ],
+            [
+              "pedro",
+              "treviño"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "picas",
+        "juan maria",
+        "anastasia",
+        "alfredo",
+        "lucas",
+        "flor",
+        "juan",
+        "alvaro",
+        "rey",
+        "pepe",
+        "maria",
+        "pepe rey",
+        "feliciano",
+        "pedrito",
+        "raul",
+        "jose",
+        "juanito",
+        "manolo",
+        "pinto",
+        "alberto",
+        "juanjo",
+        "josep",
+        "manolito",
+        "francisco",
+        "trini",
+        "pablo",
+        "pilar",
+        "encarna",
+        "mariana",
+        "grub",
+        "juana",
+        "paula"
+      ]
+    },
+    {
+      "index": 2,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "juana",
+              "pepe"
+            ],
+            [
+              "alvaro",
+              "grub"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "feliciano",
+              "paula"
+            ],
+            [
+              "maria",
+              "zacarías"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "mariana",
+        "pilar",
+        "juan",
+        "pedro",
+        "juanjo",
+        "pedrito",
+        "encarna",
+        "trini",
+        "manolo",
+        "pablo",
+        "pinto",
+        "alfredo",
+        "manolito",
+        "sebas",
+        "francisco",
+        "raul",
+        "flor",
+        "jose",
+        "josep",
+        "juanito",
+        "alberto",
+        "pepe rey",
+        "lucas",
+        "rey",
+        "treviño",
+        "marcos",
+        "marquitos",
+        "pablito",
+        "funesto",
+        "picas",
+        "anastasia",
+        "juan maria"
+      ]
+    },
+    {
+      "index": 3,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "alvaro",
+              "juan"
+            ],
+            [
+              "pedrito",
+              "treviño"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "anastasia",
+              "mariana"
+            ],
+            [
+              "picas",
+              "alfredo"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "juan maria",
+        "zacarías",
+        "maria",
+        "funesto",
+        "pepe",
+        "marcos",
+        "paula",
+        "pablito",
+        "marquitos",
+        "pedro",
+        "manolo",
+        "manolito",
+        "flor",
+        "juanito",
+        "lucas",
+        "sebas",
+        "rey",
+        "francisco",
+        "juana",
+        "pepe rey",
+        "grub",
+        "pilar",
+        "encarna",
+        "pablo",
+        "josep",
+        "jose",
+        "trini",
+        "alberto",
+        "juanjo",
+        "raul",
+        "feliciano",
+        "pinto"
+      ]
+    },
+    {
+      "index": 4,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "sebas",
+              "marcos"
+            ],
+            [
+              "flor",
+              "rey"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "maria",
+              "anastasia"
+            ],
+            [
+              "lucas",
+              "marquitos"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "juan",
+        "pepe",
+        "juan maria",
+        "funesto",
+        "alfredo",
+        "picas",
+        "treviño",
+        "pablito",
+        "juanjo",
+        "raul",
+        "feliciano",
+        "pinto",
+        "pepe rey",
+        "jose",
+        "josep",
+        "alberto",
+        "grub",
+        "alvaro",
+        "juana",
+        "mariana",
+        "pedro",
+        "zacarías",
+        "paula",
+        "pilar",
+        "pedrito",
+        "manolo",
+        "manolito",
+        "encarna",
+        "juanito",
+        "francisco",
+        "trini",
+        "pablo"
+      ]
+    },
+    {
+      "index": 5,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "manolito",
+              "flor"
+            ],
+            [
+              "manolo",
+              "grub"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "juanito",
+              "pedro"
+            ],
+            [
+              "francisco",
+              "lucas"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "sebas",
+        "rey",
+        "alfredo",
+        "pedrito",
+        "maria",
+        "zacarías",
+        "mariana",
+        "pepe",
+        "juana",
+        "alvaro",
+        "paula",
+        "pablo",
+        "juan",
+        "pinto",
+        "encarna",
+        "trini",
+        "feliciano",
+        "pilar",
+        "juanjo",
+        "raul",
+        "jose",
+        "alberto",
+        "pepe rey",
+        "josep",
+        "anastasia",
+        "funesto",
+        "picas",
+        "treviño",
+        "juan maria",
+        "marcos",
+        "pablito",
+        "marquitos"
+      ]
+    },
+    {
+      "index": 6,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "alvaro",
+              "zacarías"
+            ],
+            [
+              "raul",
+              "alfredo"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "manolito",
+              "pedrito"
+            ],
+            [
+              "pedro",
+              "feliciano"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "manolo",
+        "francisco",
+        "juanito",
+        "juanjo",
+        "pinto",
+        "jose",
+        "grub",
+        "josep",
+        "juan",
+        "pepe rey",
+        "pepe",
+        "maria",
+        "alberto",
+        "rey",
+        "juana",
+        "paula",
+        "lucas",
+        "flor",
+        "sebas",
+        "mariana",
+        "encarna",
+        "trini",
+        "pilar",
+        "pablo",
+        "marquitos",
+        "pablito",
+        "picas",
+        "anastasia",
+        "funesto",
+        "marcos",
+        "juan maria",
+        "treviño"
+      ]
+    },
+    {
+      "index": 7,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "anastasia",
+              "juanjo"
+            ],
+            [
+              "alberto",
+              "raul"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "jose",
+              "picas"
+            ],
+            [
+              "pepe rey",
+              "pablito"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "pepe",
+        "marcos",
+        "juan maria",
+        "feliciano",
+        "treviño",
+        "josep",
+        "marquitos",
+        "maria",
+        "funesto",
+        "alfredo",
+        "juan",
+        "pinto",
+        "lucas",
+        "flor",
+        "sebas",
+        "rey",
+        "manolito",
+        "juanito",
+        "pedro",
+        "manolo",
+        "francisco",
+        "alvaro",
+        "pedrito",
+        "zacarías",
+        "juana",
+        "paula",
+        "encarna",
+        "mariana",
+        "grub",
+        "trini",
+        "pablo",
+        "pilar"
+      ]
+    },
+    {
+      "index": 8,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "pablito",
+              "alberto"
+            ],
+            [
+              "marquitos",
+              "flor"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "pepe",
+              "marcos"
+            ],
+            [
+              "funesto",
+              "treviño"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "anastasia",
+        "picas",
+        "juan maria",
+        "maria",
+        "pedro",
+        "jose",
+        "sebas",
+        "pepe rey",
+        "alvaro",
+        "josep",
+        "lucas",
+        "juana",
+        "zacarías",
+        "feliciano",
+        "pedrito",
+        "rey",
+        "paula",
+        "grub",
+        "juanito",
+        "mariana",
+        "manolito",
+        "pinto",
+        "pilar",
+        "pablo",
+        "trini",
+        "raul",
+        "juanjo",
+        "encarna",
+        "manolo",
+        "francisco",
+        "alfredo",
+        "juan"
+      ]
+    },
+    {
+      "index": 9,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "manolo",
+              "alfredo"
+            ],
+            [
+              "feliciano",
+              "funesto"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "juanjo",
+              "marcos"
+            ],
+            [
+              "marquitos",
+              "picas"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "juan maria",
+        "treviño",
+        "anastasia",
+        "pablito",
+        "zacarías",
+        "maria",
+        "manolito",
+        "juanito",
+        "juan",
+        "francisco",
+        "raul",
+        "pedro",
+        "sebas",
+        "flor",
+        "pepe",
+        "alvaro",
+        "pedrito",
+        "juana",
+        "pilar",
+        "pinto",
+        "grub",
+        "pepe rey",
+        "lucas",
+        "trini",
+        "rey",
+        "encarna",
+        "mariana",
+        "paula",
+        "jose",
+        "josep",
+        "pablo",
+        "alberto"
+      ]
+    },
+    {
+      "index": 10,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "rey",
+              "mariana"
+            ],
+            [
+              "encarna",
+              "trini"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "pepe",
+              "pablo"
+            ],
+            [
+              "flor",
+              "zacarías"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "juan",
+        "lucas",
+        "pilar",
+        "sebas",
+        "alvaro",
+        "grub",
+        "alfredo",
+        "paula",
+        "juana",
+        "maria",
+        "pepe rey",
+        "manolo",
+        "manolito",
+        "pedrito",
+        "francisco",
+        "pedro",
+        "juanjo",
+        "juanito",
+        "raul",
+        "pinto",
+        "josep",
+        "jose",
+        "alberto",
+        "feliciano",
+        "funesto",
+        "picas",
+        "anastasia",
+        "pablito",
+        "marcos",
+        "treviño",
+        "juan maria",
+        "marquitos"
+      ]
+    },
+    {
+      "index": 11,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "sebas",
+              "juan"
+            ],
+            [
+              "manolo",
+              "trini"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "maria",
+              "juanjo"
+            ],
+            [
+              "jose",
+              "pilar"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "pablo",
+        "paula",
+        "alfredo",
+        "alvaro",
+        "zacarías",
+        "encarna",
+        "pepe rey",
+        "pepe",
+        "manolito",
+        "flor",
+        "josep",
+        "lucas",
+        "rey",
+        "raul",
+        "mariana",
+        "juana",
+        "juanito",
+        "francisco",
+        "pedrito",
+        "alberto",
+        "pedro",
+        "grub",
+        "feliciano",
+        "pinto",
+        "marquitos",
+        "marcos",
+        "funesto",
+        "pablito",
+        "treviño",
+        "picas",
+        "anastasia",
+        "juan maria"
+      ]
+    },
+    {
+      "index": 12,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "pedro",
+              "alvaro"
+            ],
+            [
+              "grub",
+              "pedrito"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "pepe rey",
+              "pablo"
+            ],
+            [
+              "lucas",
+              "juana"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "pepe",
+        "alfredo",
+        "pilar",
+        "paula",
+        "flor",
+        "mariana",
+        "maria",
+        "trini",
+        "encarna",
+        "jose",
+        "zacarías",
+        "pinto",
+        "francisco",
+        "juanito",
+        "manolo",
+        "josep",
+        "manolito",
+        "sebas",
+        "alberto",
+        "raul",
+        "juanjo",
+        "juan",
+        "rey",
+        "feliciano",
+        "pablito",
+        "marcos",
+        "marquitos",
+        "funesto",
+        "juan maria",
+        "picas",
+        "anastasia",
+        "treviño"
+      ]
+    },
+    {
+      "index": 13,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "juan",
+              "lucas"
+            ],
+            [
+              "anastasia",
+              "pablito"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "juan maria",
+              "treviño"
+            ],
+            [
+              "picas",
+              "sebas"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "funesto",
+        "marcos",
+        "pepe",
+        "alfredo",
+        "marquitos",
+        "maria",
+        "rey",
+        "flor",
+        "josep",
+        "jose",
+        "alberto",
+        "feliciano",
+        "pepe rey",
+        "juanjo",
+        "raul",
+        "pinto",
+        "pedro",
+        "zacarías",
+        "alvaro",
+        "pedrito",
+        "manolo",
+        "manolito",
+        "juanito",
+        "francisco",
+        "juana",
+        "grub",
+        "paula",
+        "mariana",
+        "pilar",
+        "trini",
+        "pablo",
+        "encarna"
+      ]
+    },
+    {
+      "index": 14,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "pilar",
+              "feliciano"
+            ],
+            [
+              "josep",
+              "trini"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "grub",
+              "zacarías"
+            ],
+            [
+              "pinto",
+              "juana"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "encarna",
+        "jose",
+        "manolo",
+        "pablo",
+        "mariana",
+        "juanjo",
+        "pepe rey",
+        "alberto",
+        "juan",
+        "pedro",
+        "alvaro",
+        "alfredo",
+        "paula",
+        "pedrito",
+        "francisco",
+        "pepe",
+        "raul",
+        "maria",
+        "manolito",
+        "sebas",
+        "juanito",
+        "flor",
+        "lucas",
+        "rey",
+        "juan maria",
+        "marcos",
+        "pablito",
+        "treviño",
+        "picas",
+        "anastasia",
+        "marquitos",
+        "funesto"
+      ]
+    },
+    {
+      "index": 15,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "francisco",
+              "maria"
+            ],
+            [
+              "alfredo",
+              "marcos"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "marquitos",
+              "pablito"
+            ],
+            [
+              "pablo",
+              "alvaro"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "manolo",
+        "funesto",
+        "treviño",
+        "picas",
+        "juan maria",
+        "anastasia",
+        "juan",
+        "pedro",
+        "pepe",
+        "flor",
+        "manolito",
+        "grub",
+        "sebas",
+        "pepe rey",
+        "juanito",
+        "lucas",
+        "rey",
+        "josep",
+        "juanjo",
+        "jose",
+        "alberto",
+        "raul",
+        "pinto",
+        "feliciano",
+        "zacarías",
+        "juana",
+        "mariana",
+        "pilar",
+        "pedrito",
+        "trini",
+        "paula",
+        "encarna"
+      ]
+    },
+    {
+      "index": 16,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "jose",
+              "flor"
+            ],
+            [
+              "alberto",
+              "juan"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "pepe",
+              "raul"
+            ],
+            [
+              "pepe rey",
+              "josep"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "lucas",
+        "juanjo",
+        "maria",
+        "alfredo",
+        "pinto",
+        "rey",
+        "feliciano",
+        "sebas",
+        "francisco",
+        "alvaro",
+        "manolito",
+        "manolo",
+        "zacarías",
+        "juanito",
+        "pedrito",
+        "pedro",
+        "encarna",
+        "pilar",
+        "grub",
+        "juana",
+        "mariana",
+        "pablo",
+        "paula",
+        "trini",
+        "funesto",
+        "pablito",
+        "marquitos",
+        "marcos",
+        "picas",
+        "treviño",
+        "anastasia",
+        "juan maria"
+      ]
+    },
+    {
+      "index": 17,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "encarna",
+              "josep"
+            ],
+            [
+              "trini",
+              "maria"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "rey",
+              "pedro"
+            ],
+            [
+              "juanjo",
+              "pilar"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "pepe rey",
+        "jose",
+        "zacarías",
+        "juana",
+        "alberto",
+        "pedrito",
+        "lucas",
+        "grub",
+        "pinto",
+        "raul",
+        "sebas",
+        "mariana",
+        "francisco",
+        "alvaro",
+        "juanito",
+        "flor",
+        "paula",
+        "feliciano",
+        "manolo",
+        "pepe",
+        "alfredo",
+        "juan",
+        "manolito",
+        "pablo",
+        "funesto",
+        "pablito",
+        "marcos",
+        "treviño",
+        "marquitos",
+        "picas",
+        "anastasia",
+        "juan maria"
+      ]
+    },
+    {
+      "index": 18,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "juana",
+              "raul"
+            ],
+            [
+              "flor",
+              "juanito"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "feliciano",
+              "zacarías"
+            ],
+            [
+              "pepe rey",
+              "juanjo"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "manolo",
+        "jose",
+        "sebas",
+        "alvaro",
+        "rey",
+        "grub",
+        "francisco",
+        "paula",
+        "pinto",
+        "josep",
+        "alberto",
+        "lucas",
+        "maria",
+        "alfredo",
+        "juan",
+        "pepe",
+        "pilar",
+        "encarna",
+        "trini",
+        "manolito",
+        "pedrito",
+        "pedro",
+        "pablo",
+        "mariana",
+        "funesto",
+        "marcos",
+        "marquitos",
+        "pablito",
+        "picas",
+        "treviño",
+        "anastasia",
+        "juan maria"
+      ]
+    },
+    {
+      "index": 19,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "juan maria",
+              "pablito"
+            ],
+            [
+              "paula",
+              "juana"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "treviño",
+              "marquitos"
+            ],
+            [
+              "alvaro",
+              "funesto"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "encarna",
+        "trini",
+        "anastasia",
+        "marcos",
+        "picas",
+        "pilar",
+        "manolito",
+        "flor",
+        "pablo",
+        "juanito",
+        "juan",
+        "pepe rey",
+        "zacarías",
+        "pedro",
+        "pepe",
+        "grub",
+        "feliciano",
+        "raul",
+        "jose",
+        "josep",
+        "mariana",
+        "pedrito",
+        "manolo",
+        "francisco",
+        "sebas",
+        "maria",
+        "alberto",
+        "juanjo",
+        "lucas",
+        "rey",
+        "alfredo",
+        "pinto"
+      ]
+    }
+  ]
+}

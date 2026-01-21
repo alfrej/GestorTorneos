@@ -1,0 +1,37 @@
+{
+  "id": "23",
+  "name": "23",
+  "rounds_count": 1,
+  "courts": 1,
+  "players": [
+    "1",
+    "2",
+    "3",
+    "4"
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "2",
+              "1"
+            ],
+            [
+              "4",
+              "3"
+            ]
+          ],
+          "result": {
+            "teamA": 1,
+            "teamB": 2
+          }
+        }
+      ],
+      "bench": []
+    }
+  ]
+}

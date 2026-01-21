@@ -1,0 +1,42 @@
+{
+  "id": "yy",
+  "name": "Yy",
+  "rounds_count": 1,
+  "courts": 1,
+  "players": [
+    "1",
+    "15",
+    "6",
+    "68",
+    "9",
+    "0"
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "15",
+              "9"
+            ],
+            [
+              "0",
+              "68"
+            ]
+          ],
+          "result": {
+            "teamA": 3,
+            "teamB": 3
+          }
+        }
+      ],
+      "bench": [
+        "1",
+        "6"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestor de Torneos</title>
+    <style>
+      :root {
+        --bg: #f2f0ea;
+        --accent: #1f4e5f;
+        --accent-dark: #153844;
+        --card: #ffffff;
+        --shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Georgia", "Times New Roman", serif;
+        background: radial-gradient(circle at top, #fff8e8 0%, var(--bg) 45%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1b1b1b;
+      }
+      .card {
+        background: var(--card);
+        padding: 48px 56px;
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        width: min(520px, 90vw);
+      }
+      .panel {
+        display: none;
+        margin-top: 28px;
+        text-align: left;
+      }
+      .panel.active {
+        display: block;
+      }
+      h1 {
+        margin: 0 0 36px;
+        font-size: clamp(32px, 5vw, 42px);
+        letter-spacing: 1px;
+      }
+      .actions {
+        display: grid;
+        gap: 18px;
+      }
+      .field {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      label {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #3a3a3a;
+      }
+      input {
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid #c9c3b9;
+        font-size: 16px;
+      }
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 16px 20px;
+        font-size: 18px;
+        cursor: pointer;
+        background: var(--accent);
+        color: white;
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+      button.secondary {
+        background: transparent;
+        color: var(--accent-dark);
+        border: 2px solid var(--accent-dark);
+      }
+      button.full-action {
+        width: 100%;
+      }
+      button:hover {
+        transform: translateY(-2px);
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      .players {
+        display: grid;
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .players ul {
+        list-style: none;
+        padding: 0;
+        margin: 12px 0 0;
+        display: grid;
+        gap: 10px;
+      }
+      .players li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f6f3ed;
+        padding: 10px 12px;
+        border-radius: 12px;
+      }
+      .players button {
+        padding: 8px 12px;
+        font-size: 14px;
+        border-radius: 12px;
+        background: #b84b3c;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 44px;
+        gap: 12px;
+        align-items: end;
+      }
+      .row button {
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border-radius: 50%;
+        font-size: 22px;
+        line-height: 1;
+      }
+      @media (max-width: 600px) {
+        .card {
+          padding: 36px 28px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Nuevo torneo</h1>
+      <section id="tournament-panel" class="panel active">
+        <div class="field">
+          <label for="tournament-name">Nombre del torneo</label>
+          <input id="tournament-name" type="text" placeholder="Ej. Copa Primavera" />
+          <div id="tournament-warning" style="display: none; color: #b84b3c">
+            Ya existe un torneo con ese nombre.
+          </div>
+        </div>
+        <div class="field">
+          <label for="rounds">Rondas</label>
+          <input id="rounds" type="number" min="1" placeholder="Ej. 5" />
+        </div>
+        <div class="field">
+          <label for="courts">Numero de pistas</label>
+          <input
+            id="courts"
+            type="number"
+            min="1"
+            placeholder="Ej. 3"
+          />
+        </div>
+        <div class="players">
+          <label for="player-name">Jugadores</label>
+          <div class="row">
+            <input id="player-name" type="text" placeholder="Nombre del jugador" />
+            <button id="add-player" type="button" aria-label="Agregar jugador">
+              +
+            </button>
+          </div>
+          <div id="player-warning" style="display: none; color: #b84b3c">
+            Ese jugador ya existe.
+          </div>
+          <ul id="players-list"></ul>
+        </div>
+        <div class="actions" style="margin-top: 22px">
+          <button id="generate-matches" type="button">
+            Generar partidos
+          </button>
+        </div>
+        <section id="rounds-results" class="panel" aria-live="polite"></section>
+      </section>
+    </main>
+    <script>
+      const panel = document.getElementById("tournament-panel");
+      const addPlayer = document.getElementById("add-player");
+      const playerName = document.getElementById("player-name");
+      const playersList = document.getElementById("players-list");
+      const playerWarning = document.getElementById("player-warning");
+      const roundsInput = document.getElementById("rounds");
+      const courtsInput = document.getElementById("courts");
+      const generateButton = document.getElementById("generate-matches");
+      const resultsPanel = document.getElementById("rounds-results");
+      const tournamentNameInput = document.getElementById("tournament-name");
+      const tournamentWarning = document.getElementById("tournament-warning");
+      let lastGenerated = null;
+
+      function redirectHome() {
+        window.location.replace("/");
+      }
+
+      function watchServer() {
+        fetch("/api/ping", { cache: "no-store" })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("offline");
+            }
+          })
+          .catch(() => {
+            redirectHome();
+          });
+      }
+
+      function removePlayer(event) {
+        const item = event.currentTarget.closest("li");
+        if (item) {
+          item.remove();
+          resetGenerated();
+        }
+      }
+
+      function resetGenerated() {
+        lastGenerated = null;
+        resultsPanel.innerHTML = "";
+        resultsPanel.classList.remove("active");
+      }
+
+      function addPlayerItem(name) {
+        const li = document.createElement("li");
+        const span = document.createElement("span");
+        span.textContent = name;
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "Borrar";
+        remove.addEventListener("click", removePlayer);
+        li.appendChild(span);
+        li.appendChild(remove);
+        playersList.appendChild(li);
+      }
+
+      addPlayer.addEventListener("click", () => {
+        const name = playerName.value.trim();
+        if (!name) {
+          return;
+        }
+        const normalized = name.toLowerCase();
+        const existing = getPlayers().some(
+          (player) => player.toLowerCase() === normalized
+        );
+        if (existing) {
+          playerWarning.style.display = "block";
+          return;
+        }
+        playerWarning.style.display = "none";
+        addPlayerItem(name);
+        resetGenerated();
+        playerName.value = "";
+        playerName.focus();
+      });
+
+      playerName.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          addPlayer.click();
+        }
+      });
+
+      function getPlayers() {
+        return Array.from(playersList.querySelectorAll("li span"))
+          .map((span) => span.textContent.trim())
+          .filter(Boolean);
+      }
+
+      function pairKey(a, b) {
+        return [a, b].sort().join("||");
+      }
+
+      function matchKey(group) {
+        return [...group].sort().join("||");
+      }
+
+      function getPairingOptions(group) {
+        const [a, b, c, d] = group;
+        return [
+          [
+            [a, b],
+            [c, d],
+          ],
+          [
+            [a, c],
+            [b, d],
+          ],
+          [
+            [a, d],
+            [b, c],
+          ],
+        ];
+      }
+
+      function evaluateGroup(group, partnerCounts, matchHistory, coPlayCounts) {
+        const key = matchKey(group);
+        let best = null;
+        for (const pairing of getPairingOptions(group)) {
+          let partnerScore = 0;
+          for (const [x, y] of pairing) {
+            partnerScore += partnerCounts.get(pairKey(x, y)) || 0;
+          }
+          let coplayScore = 0;
+          for (let i = 0; i < group.length; i++) {
+            for (let j = i + 1; j < group.length; j++) {
+              coplayScore += coPlayCounts.get(pairKey(group[i], group[j])) || 0;
+            }
+          }
+          const matchScore = matchHistory.has(key) ? 1 : 0;
+          const totalScore = partnerScore * 100 + matchScore * 20 + coplayScore;
+          if (!best || totalScore < best.score) {
+            best = { pairing, score: totalScore };
+          }
+        }
+        return { pairing: best.pairing, score: best.score, key };
+      }
+
+      function generateRoundSchedule(
+        players,
+        courtsCount,
+        partnerCounts,
+        matchHistory,
+        coPlayCounts,
+        restCounts
+      ) {
+        const activeCount = courtsCount * 4;
+        const attempts = 200;
+        let best = null;
+
+        for (let attempt = 0; attempt < attempts; attempt++) {
+          const shuffled = [...players].sort(() => Math.random() - 0.5);
+          const active = shuffled.slice(0, activeCount);
+          const bench = shuffled.slice(activeCount);
+          const matches = [];
+          let roundScore = 0;
+
+          let restMin = Infinity;
+          let restMax = -Infinity;
+          for (const player of players) {
+            const rests = (restCounts.get(player) || 0) + (bench.includes(player) ? 1 : 0);
+            restMin = Math.min(restMin, rests);
+            restMax = Math.max(restMax, rests);
+          }
+          const restDiff = restMax - restMin;
+
+          for (let i = 0; i < active.length; i += 4) {
+            const group = active.slice(i, i + 4);
+            const evalResult = evaluateGroup(
+              group,
+              partnerCounts,
+              matchHistory,
+              coPlayCounts
+            );
+            matches.push({
+              group,
+              pairing: evalResult.pairing,
+              key: evalResult.key,
+            });
+            roundScore += evalResult.score;
+          }
+
+          roundScore += restDiff > 1 ? 1000 + restDiff * 50 : restDiff * 5;
+
+          if (!best || roundScore < best.score) {
+            best = { matches, bench, score: roundScore };
+          }
+        }
+
+        return best;
+      }
+
+      function updateHistory(
+        matches,
+        partnerCounts,
+        matchHistory,
+        coPlayCounts,
+        bench,
+        restCounts
+      ) {
+        for (const match of matches) {
+          matchHistory.add(match.key);
+          for (const [x, y] of match.pairing) {
+            const key = pairKey(x, y);
+            partnerCounts.set(key, (partnerCounts.get(key) || 0) + 1);
+          }
+          const group = match.group;
+          for (let i = 0; i < group.length; i++) {
+            for (let j = i + 1; j < group.length; j++) {
+              const key = pairKey(group[i], group[j]);
+              coPlayCounts.set(key, (coPlayCounts.get(key) || 0) + 1);
+            }
+          }
+        }
+        bench.forEach((player) => {
+          restCounts.set(player, (restCounts.get(player) || 0) + 1);
+        });
+      }
+
+      function renderResults(rounds, courtsUsed) {
+        resultsPanel.innerHTML = "";
+        resultsPanel.classList.add("active");
+
+        const title = document.createElement("h2");
+        title.textContent = "Rondas";
+        resultsPanel.appendChild(title);
+
+        const summary = new Map();
+        const payloadRounds = [];
+
+        rounds.forEach((round, index) => {
+          const roundBlock = document.createElement("div");
+          roundBlock.style.marginTop = "18px";
+
+          const heading = document.createElement("h3");
+          heading.textContent = `Ronda ${index + 1}`;
+          roundBlock.appendChild(heading);
+
+          const list = document.createElement("ul");
+          list.style.listStyle = "none";
+          list.style.padding = "0";
+          list.style.margin = "10px 0 0";
+
+          const payloadMatches = [];
+          round.matches.forEach((match, matchIndex) => {
+            const item = document.createElement("li");
+            item.style.padding = "8px 0";
+            const teamA = match.pairing[0].join(" + ");
+            const teamB = match.pairing[1].join(" + ");
+            item.textContent = `Pista ${matchIndex + 1}: ${teamA} vs ${teamB}`;
+            list.appendChild(item);
+            payloadMatches.push({
+              index: matchIndex,
+              teams: match.pairing,
+              result: { teamA: null, teamB: null },
+            });
+            match.group.forEach((player) => {
+              const current = summary.get(player) || { played: 0, rested: 0 };
+              current.played += 1;
+              summary.set(player, current);
+            });
+          });
+
+          if (round.bench.length) {
+            const benchItem = document.createElement("li");
+            benchItem.style.padding = "8px 0";
+            benchItem.textContent = `Descansan: ${round.bench.join(", ")}`;
+            list.appendChild(benchItem);
+            round.bench.forEach((player) => {
+              const current = summary.get(player) || { played: 0, rested: 0 };
+              current.rested += 1;
+              summary.set(player, current);
+            });
+          }
+
+          roundBlock.appendChild(list);
+          resultsPanel.appendChild(roundBlock);
+          payloadRounds.push({
+            index,
+            matches: payloadMatches,
+            bench: round.bench,
+          });
+        });
+
+        if (summary.size) {
+          const summaryBlock = document.createElement("div");
+          summaryBlock.style.marginTop = "24px";
+
+          const heading = document.createElement("h3");
+          heading.textContent = "Resumen";
+          summaryBlock.appendChild(heading);
+
+          const list = document.createElement("ul");
+          list.style.listStyle = "none";
+          list.style.padding = "0";
+          list.style.margin = "10px 0 0";
+
+          Array.from(summary.entries())
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .forEach(([name, info]) => {
+              const item = document.createElement("li");
+              item.style.padding = "6px 0";
+              item.textContent = `${name}: juega ${info.played} partidos, descansa ${info.rested}`;
+              list.appendChild(item);
+            });
+
+          summaryBlock.appendChild(list);
+          resultsPanel.appendChild(summaryBlock);
+        }
+
+        const startButton = document.createElement("button");
+        startButton.type = "button";
+        startButton.textContent = "Comenzar torneo";
+        startButton.className = "full-action";
+        startButton.style.marginTop = "22px";
+        startButton.addEventListener("click", () => {
+          if (!lastGenerated) {
+            return;
+          }
+          startButton.disabled = true;
+          startButton.textContent = "Guardando...";
+          fetch("/api/tournaments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(lastGenerated),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                return response.json().then((data) => {
+                  const error = new Error(data.error || "Respuesta invalida");
+                  error.status = response.status;
+                  throw error;
+                });
+              }
+              return response.json();
+            })
+            .then((data) => {
+              if (data.redirect) {
+                window.location.replace(data.redirect);
+                return;
+              }
+              throw new Error("Respuesta invalida");
+            })
+            .catch((error) => {
+              startButton.disabled = false;
+              startButton.textContent = "Comenzar torneo";
+              if (error.status === 409) {
+                tournamentWarning.style.display = "block";
+                showError(error.message || "Ya existe un torneo con ese nombre.");
+                return;
+              }
+              showError(error.message || "No se pudo guardar el torneo.");
+            });
+        });
+        resultsPanel.appendChild(startButton);
+
+        lastGenerated = {
+          name: tournamentNameInput.value.trim(),
+          rounds_count: rounds.length,
+          courts: courtsUsed,
+          players: getPlayers(),
+          rounds: payloadRounds,
+        };
+      }
+
+      function showError(message) {
+        resultsPanel.innerHTML = "";
+        resultsPanel.classList.add("active");
+        const text = document.createElement("p");
+        text.textContent = message;
+        resultsPanel.appendChild(text);
+      }
+
+      generateButton.addEventListener("click", () => {
+        const players = getPlayers();
+        const roundsCount = parseInt(roundsInput.value, 10);
+        const courtsCount = parseInt(courtsInput.value, 10);
+
+        if (!players.length) {
+          showError("Agrega jugadores antes de generar los partidos.");
+          return;
+        }
+        if (!roundsCount || roundsCount < 1) {
+          showError("Indica un numero de rondas valido.");
+          return;
+        }
+        if (!courtsCount || courtsCount < 1) {
+          showError("Indica un numero de pistas valido.");
+          return;
+        }
+        const usableCourts = Math.min(
+          courtsCount,
+          Math.floor(players.length / 4)
+        );
+        if (usableCourts < 1) {
+          showError("Se necesitan al menos 4 jugadores para generar partidos.");
+          return;
+        }
+
+        const partnerCounts = new Map();
+        const coPlayCounts = new Map();
+        const matchHistory = new Set();
+        const restCounts = new Map();
+        const rounds = [];
+
+        for (let roundIndex = 0; roundIndex < roundsCount; roundIndex++) {
+          const roundSchedule = generateRoundSchedule(
+            players,
+            usableCourts,
+            partnerCounts,
+            matchHistory,
+            coPlayCounts,
+            restCounts
+          );
+          rounds.push(roundSchedule);
+          updateHistory(
+            roundSchedule.matches,
+            partnerCounts,
+            matchHistory,
+            coPlayCounts,
+            roundSchedule.bench,
+            restCounts
+          );
+        }
+
+        renderResults(rounds, usableCourts);
+      });
+
+      function checkTournamentName() {
+        const name = tournamentNameInput.value.trim();
+        if (!name) {
+          tournamentWarning.style.display = "none";
+          return;
+        }
+        fetch(`/api/tournaments/exists?name=${encodeURIComponent(name)}`)
+          .then((response) => response.json())
+          .then((data) => {
+            tournamentWarning.style.display = data.exists ? "block" : "none";
+          })
+          .catch(() => {
+            tournamentWarning.style.display = "none";
+          });
+      }
+
+      tournamentNameInput.addEventListener("blur", checkTournamentName);
+      tournamentNameInput.addEventListener("input", () => {
+        tournamentWarning.style.display = "none";
+      });
+
+      watchServer();
+      setInterval(watchServer, 5000);
+    </script>
+  </body>
+</html>

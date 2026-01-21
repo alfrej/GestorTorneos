@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Abrir torneo</title>
+    <style>
+      :root {
+        --bg: #f2f0ea;
+        --accent: #1f4e5f;
+        --accent-dark: #153844;
+        --card: #ffffff;
+        --danger: #b84b3c;
+        --shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Georgia", "Times New Roman", serif;
+        background: radial-gradient(circle at top, #fff8e8 0%, var(--bg) 45%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1b1b1b;
+      }
+      .panel {
+        background: var(--card);
+        padding: 44px 52px;
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        width: min(720px, 92vw);
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 40px);
+        letter-spacing: 1px;
+      }
+      .header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .title {
+        text-align: center;
+      }
+      .list {
+        display: grid;
+        gap: 16px;
+        margin-top: 12px;
+      }
+      .item {
+        display: grid;
+        gap: 12px;
+        align-items: center;
+        grid-template-columns: 1fr;
+        background: #f7f4ef;
+        padding: 16px 18px;
+        border-radius: 18px;
+      }
+      .name {
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .meta {
+        font-size: 14px;
+        color: #4b4b4b;
+        margin-top: 4px;
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 16px;
+        cursor: pointer;
+        background: var(--accent);
+        color: white;
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+      button.secondary {
+        background: transparent;
+        color: var(--accent-dark);
+        border: 2px solid var(--accent-dark);
+      }
+      button.danger {
+        background: var(--danger);
+      }
+      button:hover {
+        transform: translateY(-2px);
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      .status {
+        margin-top: 12px;
+        font-size: 14px;
+        color: #4b4b4b;
+      }
+      @media (min-width: 640px) {
+        .item {
+          grid-template-columns: 1fr auto;
+        }
+      }
+      @media (max-width: 600px) {
+        .panel {
+          padding: 36px 28px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel">
+      <div class="header">
+        <h1 class="title">Torneos</h1>
+      </div>
+      <div id="list" class="list"></div>
+      <div id="status" class="status"></div>
+    </main>
+    <script>
+      const list = document.getElementById("list");
+      const status = document.getElementById("status");
+
+      function redirectHome() {
+        window.location.replace("/");
+      }
+
+      function watchServer() {
+        fetch("/api/ping", { cache: "no-store" })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("offline");
+            }
+          })
+          .catch(() => {
+            redirectHome();
+          });
+      }
+
+      function setStatus(message) {
+        status.textContent = message || "";
+      }
+
+      function renderEmpty() {
+        list.innerHTML = "";
+        const empty = document.createElement("div");
+        empty.className = "item";
+        const text = document.createElement("div");
+        text.className = "name";
+        text.textContent = "No hay torneos guardados.";
+        empty.appendChild(text);
+        list.appendChild(empty);
+      }
+
+      function loadTournaments() {
+        setStatus("Cargando torneos...");
+        fetch("/api/tournaments/list")
+          .then((response) => response.json())
+          .then((data) => {
+            list.innerHTML = "";
+            const tournaments = data.tournaments || [];
+            if (!tournaments.length) {
+              renderEmpty();
+              setStatus("");
+              return;
+            }
+            tournaments.forEach((tournament) => {
+              const item = document.createElement("div");
+              item.className = "item";
+
+              const info = document.createElement("div");
+              const name = document.createElement("div");
+              name.className = "name";
+              name.textContent = tournament.name || tournament.id;
+              info.appendChild(name);
+
+              const meta = document.createElement("div");
+              meta.className = "meta";
+              if (tournament.finished) {
+                meta.textContent = "Finalizado";
+              } else {
+                const total = tournament.total_rounds || 0;
+                const done = tournament.completed_rounds || 0;
+                meta.textContent = `Rondas ${done}/${total}`;
+              }
+              info.appendChild(meta);
+              item.appendChild(info);
+
+              const actions = document.createElement("div");
+              actions.className = "actions";
+
+              const open = document.createElement("button");
+              open.type = "button";
+              open.textContent = "Abrir";
+              open.addEventListener("click", () => {
+                open.disabled = true;
+                setStatus("Abriendo torneo...");
+                fetch(`/api/tournaments/${tournament.id}/open`, { method: "POST" })
+                  .then((response) => response.json())
+                  .then((payload) => {
+                    if (payload.redirect) {
+                      window.location.replace(payload.redirect);
+                      return;
+                    }
+                    throw new Error("No se pudo abrir el torneo.");
+                  })
+                  .catch(() => {
+                    open.disabled = false;
+                    setStatus("No se pudo abrir el torneo.");
+                  });
+              });
+
+              const remove = document.createElement("button");
+              remove.type = "button";
+              remove.textContent = "Borrar";
+              remove.className = "danger";
+              remove.addEventListener("click", () => {
+                if (!confirm("¿Borrar este torneo?")) {
+                  return;
+                }
+                remove.disabled = true;
+                setStatus("Borrando torneo...");
+                fetch(`/api/tournaments/${tournament.id}`, { method: "DELETE" })
+                  .then((response) => response.json())
+                  .then(() => {
+                    loadTournaments();
+                  })
+                  .catch(() => {
+                    remove.disabled = false;
+                    setStatus("No se pudo borrar el torneo.");
+                  });
+              });
+
+              actions.appendChild(open);
+              actions.appendChild(remove);
+              item.appendChild(actions);
+              list.appendChild(item);
+            });
+            setStatus("");
+          })
+          .catch(() => {
+            renderEmpty();
+            setStatus("No se pudieron cargar los torneos.");
+          });
+      }
+
+      watchServer();
+      setInterval(watchServer, 5000);
+      loadTournaments();
+    </script>
+  </body>
+</html>
