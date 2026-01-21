@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 import qrcode
 from flask import Flask, jsonify, render_template, request
 
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 
 WEB_PORT = 5050
 TOURNAMENTS_DIR = os.path.join(os.path.dirname(__file__), "Torneos")
