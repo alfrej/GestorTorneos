@@ -167,6 +167,8 @@ def start_web_server():
     @app.route("/api/tournaments/list")
     def list_tournaments():
         os.makedirs(TOURNAMENTS_DIR, exist_ok=True)
+        tournaments_path = os.path.abspath(TOURNAMENTS_DIR)
+        print(f"Leo los torneos de la ubicacion: {tournaments_path}")
         items = []
         for filename in os.listdir(TOURNAMENTS_DIR):
             if not filename.endswith(".json"):
@@ -195,10 +197,11 @@ def start_web_server():
                 if all_done:
                     completed_rounds += 1
             is_finished = total_rounds > 0 and completed_rounds >= total_rounds
+            file_base = filename.replace(".json", "")
             items.append(
                 {
-                    "id": data.get("id") or filename.replace(".json", ""),
-                    "name": data.get("name") or "Torneo",
+                    "id": data.get("id") or file_base,
+                    "name": file_base,
                     "completed_rounds": completed_rounds,
                     "total_rounds": total_rounds,
                     "finished": is_finished,
