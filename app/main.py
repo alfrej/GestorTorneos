@@ -16,19 +16,42 @@ WEB_PORT = 5050
 TOURNAMENTS_DIR = os.path.join(os.path.dirname(__file__), "Torneos")
 _state_lock = threading.Lock()
 _tournament_state = {"data": None, "version": 0}
-BG_MAIN = "#F4F1EC"
+BG_MAIN = "#F4F2ED"
 CARD_BG = "#FFFFFF"
-TEXT_COLOR = "#2F3E46"
-BTN_BG = "#1F5D73"
-BTN_HOVER = "#2B6E86"
+CARD_SHADOW = "#E3DDD3"
+TEXT_COLOR = "#27343A"
+TEXT_MUTED = "#6C7A80"
+ACCENT = "#1F6073"
+ACCENT_DARK = "#174A59"
+ACCENT_LIGHT = "#DCE9ED"
+BTN_BG = ACCENT
+BTN_HOVER = "#2B7288"
 BTN_TEXT = "#F7F7F2"
-BORDER = "#C9D6DE"
-ROW_ALT_1 = "#F7F9FA"
-ROW_ALT_2 = "#E0E6EA"
-FOCUS_BORDER = "#D64545"
-ROUND_HEADER_BG = "#EFF3F6"
-TEAM_A_TEXT = "#1F5D73"
-TEAM_B_TEXT = "#8B3E2F"
+BORDER = "#D3D8DC"
+ROW_ALT_1 = "#F8FAFB"
+ROW_ALT_2 = "#EEF2F4"
+FOCUS_BORDER = "#C9724E"
+ROUND_HEADER_BG = "#E7EFF2"
+TABLE_HEADER_BG = "#DCE9ED"
+TABLE_HEADER_TEXT = "#1F6073"
+TEAM_A_TEXT = "#1F6073"
+TEAM_B_TEXT = "#B0643E"
+
+FONT_FAMILY = "Segoe UI"
+FONT_TITLE = (FONT_FAMILY, 44, "bold")
+FONT_SUBTITLE = (FONT_FAMILY, 17)
+FONT_URL = (FONT_FAMILY, 13)
+FONT_VERSION = (FONT_FAMILY, 11)
+FONT_TOURNAMENT = (FONT_FAMILY, 46, "bold")
+FONT_SECTION = (FONT_FAMILY, 28, "bold")
+FONT_ROUND_TITLE = (FONT_FAMILY, 22, "bold")
+FONT_MATCH_TITLE = (FONT_FAMILY, 18, "bold")
+FONT_MATCH = (FONT_FAMILY, 18)
+FONT_SCORE = (FONT_FAMILY, 19, "bold")
+FONT_BENCH = (FONT_FAMILY, 17, "italic")
+FONT_TABLE_HEADER = (FONT_FAMILY, 18, "bold")
+FONT_TABLE = (FONT_FAMILY, 17)
+FONT_LEGEND = (FONT_FAMILY, 14)
 
 
 def set_current_tournament(data):
@@ -315,24 +338,53 @@ def start_gui():
     title = tk.Label(
         qr_frame,
         text="Gestor de Torneos",
-        font=("Helvetica", 40, "bold"),
+        font=FONT_TITLE,
         bg=BG_MAIN,
         fg=TEXT_COLOR,
     )
-    title.pack(pady=(0, 20))
-    qr_image = create_qr_image(url)
-    qr_label = tk.Label(qr_frame, image=qr_image, bg=CARD_BG)
+    title.pack(pady=(0, 6))
+
+    tagline = tk.Label(
+        qr_frame,
+        text="Escanea el QR para abrir el panel web",
+        font=FONT_SUBTITLE,
+        bg=BG_MAIN,
+        fg=TEXT_MUTED,
+    )
+    tagline.pack(pady=(0, 18))
+
+    qr_shadow = tk.Frame(qr_frame, bg=CARD_SHADOW, padx=2, pady=2)
+    qr_shadow.pack()
+    qr_card = tk.Frame(
+        qr_shadow,
+        bg=CARD_BG,
+        highlightbackground=BORDER,
+        highlightthickness=1,
+        padx=26,
+        pady=26,
+    )
+    qr_card.pack()
+
+    qr_image = create_qr_image(url, size=380)
+    qr_label = tk.Label(qr_card, image=qr_image, bg=CARD_BG)
     qr_label.image = qr_image
     qr_label.pack()
 
-    subtitle = tk.Label(
+    url_chip = tk.Frame(
         qr_frame,
-        text=url,
-        font=("Helvetica", 16),
         bg=BG_MAIN,
-        fg=TEXT_COLOR,
+        padx=0,
+        pady=0,
     )
-    subtitle.pack(pady=(20, 0))
+    url_chip.pack(pady=(16, 0))
+    subtitle = tk.Label(
+        url_chip,
+        text=url,
+        font=FONT_URL,
+        bg=BG_MAIN,
+        fg=TEXT_MUTED,
+    )
+    subtitle.pack()
 
     if logo_label is not None:
         logo_label.place(relx=1.0, rely=1.0, anchor="se", x=-20, y=-20)
@@ -341,9 +393,9 @@ def start_gui():
     version_label = tk.Label(
         container,
         text=f"Version {__version__}",
-        font=("Helvetica", 11),
+        font=FONT_VERSION,
         bg=BG_MAIN,
-        fg="#6B7A80",
+        fg=TEXT_MUTED,
     )
     version_label.place(relx=0.0, rely=1.0, anchor="sw", x=14, y=-8)
     version_label.lift()
@@ -364,44 +416,54 @@ def start_gui():
     tournament_title = tk.Label(
         dashboard_frame,
         text="",
-        font=("Helvetica", 50, "bold"),
+        font=FONT_TOURNAMENT,
         bg=BG_MAIN,
         fg=TEXT_COLOR,
     )
-    tournament_title.pack(pady=(20, 10))
+    tournament_title.pack(pady=(18, 12))
 
     panels = tk.Frame(dashboard_frame, bg=BG_MAIN)
-    panels.pack(expand=True, fill="both", padx=24, pady=6)
+    panels.pack(expand=True, fill="both", padx=32, pady=10)
     panels.grid_columnconfigure(0, weight=6, uniform="panels")
     panels.grid_columnconfigure(1, weight=11, uniform="panels")
     panels.grid_rowconfigure(0, weight=1)
+
+    def add_accent_line(parent):
+        line = tk.Frame(parent, bg=ACCENT, height=4, width=72)
+        line.pack(anchor="w", pady=(0, 12))
+        line.pack_propagate(False)
+        return line
 
     rounds_panel = tk.Frame(panels, bg=BG_MAIN, padx=10, pady=10)
     rounds_panel.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
     rounds_title = tk.Label(
         rounds_panel,
         text="Rondas",
-        font=("Helvetica", 30, "bold"),
+        font=FONT_SECTION,
         bg=BG_MAIN,
         fg=TEXT_COLOR,
     )
     rounds_title.pack(anchor="w", pady=(0, 6))
+    add_accent_line(rounds_panel)
 
-    def build_scrollable_card(parent):
+    def build_scrollable_card(parent, *, padx=12, pady=12):
         container = tk.Frame(parent, bg=BG_MAIN)
         container.pack(expand=True, fill="both")
         container.rowconfigure(0, weight=1)
         container.columnconfigure(0, weight=1)
 
-        canvas = tk.Canvas(container, bg=BG_MAIN, highlightthickness=0)
+        canvas = tk.Canvas(container, bg=BG_MAIN, highlightthickness=0, bd=0)
         canvas.grid(row=0, column=0, sticky="nsew")
 
         scrollbar = tk.Scrollbar(
             container,
             command=canvas.yview,
-            bg=BG_MAIN,
-            activebackground=BORDER,
+            bg=ACCENT_LIGHT,
+            activebackground=ACCENT,
             troughcolor=BG_MAIN,
+            width=12,
+            highlightthickness=0,
+            bd=0,
         )
         scrollbar.grid(row=0, column=1, sticky="ns")
 
@@ -419,6 +481,8 @@ def start_gui():
             bg=CARD_BG,
             highlightbackground=BORDER,
             highlightthickness=1,
+            padx=padx,
+            pady=pady,
         )
         window_id = canvas.create_window((0, 0), window=card, anchor="nw")
 
@@ -433,7 +497,7 @@ def start_gui():
         card._scroll_canvas = canvas
         return card
 
-    rounds_card = build_scrollable_card(rounds_panel)
+    rounds_card = build_scrollable_card(rounds_panel, padx=0)
     rounds_card.config(highlightthickness=0, highlightbackground=BG_MAIN)
 
     scoreboard_panel = tk.Frame(panels, bg=BG_MAIN, padx=10, pady=10)
@@ -441,20 +505,22 @@ def start_gui():
     scoreboard_title = tk.Label(
         scoreboard_panel,
         text="Puntuación",
-        font=("Helvetica", 30, "bold"),
+        font=FONT_SECTION,
         bg=BG_MAIN,
         fg=TEXT_COLOR,
     )
     scoreboard_title.pack(anchor="w", pady=(0, 6))
+    add_accent_line(scoreboard_panel)
     scoreboard_card = build_scrollable_card(scoreboard_panel)
     scoreboard_legend = tk.Label(
         scoreboard_panel,
         text="PG=Partidos ganados, PP=Partidos perdidos, PJ=Partidos jugados, PF=Puntos a favor, PC=Puntos en contra",
-        font=("Helvetica", 16),
-        fg=TEXT_COLOR,
+        font=FONT_LEGEND,
+        fg=TEXT_MUTED,
         bg=BG_MAIN,
         anchor="w",
         justify="left",
+        wraplength=620,
     )
     scoreboard_legend.pack(anchor="w", pady=(6, 0))
 
@@ -532,9 +598,9 @@ def start_gui():
             tk.Label(
                 rounds_card,
                 text="Sin rondas",
-                font=("Helvetica", 20),
+                font=FONT_MATCH,
                 bg=CARD_BG,
-                fg=TEXT_COLOR,
+                fg=TEXT_MUTED,
                 padx=8,
                 pady=6,
                 anchor="w",
@@ -565,7 +631,7 @@ def start_gui():
         round_cards = []
         for round_index, round_info in enumerate(rounds, start=1):
             round_card = tk.Frame(rounds_card, bg=BG_MAIN)
-            round_card.pack(fill="x", pady=8, padx=6)
+            round_card.pack(fill="x", pady=10, padx=(0, 8))
             round_cards.append(round_card)
 
             is_active = active_round_index == (round_index - 1)
@@ -582,7 +648,7 @@ def start_gui():
             tk.Label(
                 header,
                 text=f"Ronda {round_index}",
-                font=("Helvetica", 26, "bold"),
+                font=FONT_ROUND_TITLE,
                 bg=ROUND_HEADER_BG,
                 fg=TEXT_COLOR,
                 anchor="w",
@@ -591,7 +657,7 @@ def start_gui():
             ).pack(fill="x")
 
             content = tk.Frame(card_inner, bg=CARD_BG)
-            content.pack(fill="x", padx=10, pady=8)
+            content.pack(fill="x", padx=12, pady=10)
 
             for match_index, match in enumerate(round_info.get("matches", []), start=1):
                 teams = match.get("teams", [[], []])
@@ -612,7 +678,7 @@ def start_gui():
                 tk.Label(
                     info_frame,
                     text=f"Pista {match_index}",
-                    font=("Helvetica", 20, "bold"),
+                    font=FONT_MATCH_TITLE,
                     bg=row_bg,
                     fg=TEXT_COLOR,
                     padx=8,
@@ -623,39 +689,39 @@ def start_gui():
                 tk.Label(
                     teams_frame,
                     text=team_a,
-                    font=("Helvetica", 20, "bold"),
+                    font=FONT_MATCH_TITLE,
                     bg=row_bg,
                     fg=TEAM_A_TEXT,
                 ).pack(side="left")
                 tk.Label(
                     teams_frame,
                     text=" vs ",
-                    font=("Helvetica", 20),
+                    font=FONT_MATCH,
                     bg=row_bg,
                     fg=TEXT_COLOR,
                 ).pack(side="left")
                 tk.Label(
                     teams_frame,
                     text=team_b,
-                    font=("Helvetica", 20, "bold"),
+                    font=FONT_MATCH_TITLE,
                     bg=row_bg,
                     fg=TEAM_B_TEXT,
                 ).pack(side="left")
                 score_frame = tk.Frame(
                     row,
-                    bg=row_bg,
+                    bg=CARD_BG,
                     highlightbackground=BORDER,
-                    highlightthickness=3,
+                    highlightthickness=1,
                 )
                 score_frame.grid(row=0, column=1, sticky="e", padx=8, pady=4)
                 tk.Label(
                     score_frame,
                     text=score_text,
-                    font=("Helvetica", 20, "bold"),
-                    bg=row_bg,
+                    font=FONT_SCORE,
+                    bg=CARD_BG,
                     fg=TEXT_COLOR,
-                    padx=10,
-                    pady=2,
+                    padx=12,
+                    pady=4,
                 ).pack()
 
             bench = round_info.get("bench") or []
@@ -667,14 +733,14 @@ def start_gui():
                 tk.Label(
                     row,
                     text=f"{bench_label}: {', '.join(bench)}",
-                    font=("Helvetica", 19, "italic"),
+                    font=FONT_BENCH,
                     bg=row_bg,
-                    fg=TEXT_COLOR,
+                    fg=TEXT_MUTED,
                     padx=8,
                     pady=4,
                     anchor="w",
                     justify="left",
-                    wraplength=560,
+                    wraplength=640,
                 ).pack(fill="x")
             if round_index < total_rounds:
                 spacer = tk.Frame(rounds_card, bg=BG_MAIN, height=14)
@@ -699,22 +765,28 @@ def start_gui():
     def render_scoreboard(stats):
         for widget in scoreboard_card.winfo_children():
             widget.destroy()
+        scoreboard_card.config(bg=CARD_BG)
         headers = ["#", "Jugador", "PG", "PP", "PJ", "PF", "PC"]
         for col_index, text in enumerate(headers):
+            is_name = col_index == 1
+            anchor = "w" if is_name else "center"
+            padx = 10 if is_name else 6
             label = tk.Label(
                 scoreboard_card,
                 text=text,
-                font=("Helvetica", 20, "bold"),
-                bg=CARD_BG,
-                fg=TEXT_COLOR,
-                padx=5,
-                pady=6,
-                anchor="center",
+                font=FONT_TABLE_HEADER,
+                bg=TABLE_HEADER_BG,
+                fg=TABLE_HEADER_TEXT,
+                padx=padx,
+                pady=8,
+                anchor=anchor,
                 highlightthickness=1,
                 highlightbackground=BORDER,
             )
             label.grid(row=0, column=col_index, sticky="nsew")
-            scoreboard_card.grid_columnconfigure(col_index, weight=1)
+            scoreboard_card.grid_columnconfigure(
+                col_index, weight=3 if is_name else 1
+            )
 
         def _scoreboard_sort_key(item):
             player, stat = item
@@ -740,15 +812,18 @@ def start_gui():
             ]
             row_bg = ROW_ALT_1 if row_index % 2 == 0 else ROW_ALT_2
             for col_index, value in enumerate(values):
+                is_name = col_index == 1
+                anchor = "w" if is_name else "center"
+                padx = 10 if is_name else 6
                 label = tk.Label(
                     scoreboard_card,
                     text=value,
-                    font=("Helvetica", 20),
+                    font=FONT_TABLE,
                     bg=row_bg,
                     fg=TEXT_COLOR,
-                    padx=5,
-                    pady=4,
-                    anchor="center",
+                    padx=padx,
+                    pady=6,
+                    anchor=anchor,
                     highlightthickness=1,
                     highlightbackground=BORDER,
                 )
