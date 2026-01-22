@@ -511,7 +511,7 @@ def start_gui():
     
     # Header del dashboard
     header_frame = tk.Frame(dashboard_frame, bg=BG_MAIN)
-    header_frame.pack(fill="x", pady=(20, 10))
+    header_frame.pack(fill="x", pady=(4, 2))
     
     # Logo en header
     if dashboard_logo_photo is not None:
