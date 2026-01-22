@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 import qrcode
 from flask import Flask, jsonify, render_template, request
 
-__version__ = "1.0.10"
+__version__ = "1.0.11"
 
 WEB_PORT = 5050
 TOURNAMENTS_DIR = os.path.join(os.path.dirname(__file__), "Torneos")
@@ -652,36 +652,40 @@ def start_gui():
                         entry["losses"] += 1
         return stats
 
-    def render_rounds(tournament):
-        for widget in rounds_card.winfo_children():
-            widget.destroy()
-        
-        rounds_card.config(bg=CARD_BG)
-        rounds_card.columnconfigure(0, weight=1)
+    rounds_ui = {
+        "layout_sig": None,
+        "data_sig": None,
+        "rounds": [],
+        "empty_state": None,
+        "active_round_index": None,
+    }
 
-        rounds = tournament.get("rounds", [])
+    def build_rounds_layout_signature(rounds):
+        return tuple(len(round_info.get("matches", []) or []) for round_info in rounds)
+
+    def build_rounds_data_signature(rounds):
+        signature = []
+        for round_info in rounds:
+            matches_sig = []
+            for match in round_info.get("matches", []) or []:
+                teams = match.get("teams", [[], []]) or [[], []]
+                team_a = tuple(teams[0]) if len(teams) > 0 else ()
+                team_b = tuple(teams[1]) if len(teams) > 1 else ()
+                result = match.get("result") or {}
+                matches_sig.append(
+                    (team_a, team_b, result.get("teamA"), result.get("teamB"))
+                )
+            bench = tuple(round_info.get("bench") or [])
+            signature.append((tuple(matches_sig), bench))
+        return tuple(signature)
+
+    def get_active_round_index(rounds):
         if not rounds:
-            empty_state = tk.Frame(rounds_card, bg=CARD_BG)
-            empty_state.pack(expand=True, fill="both", pady=40)
-            
-            tk.Label(
-                empty_state,
-                text="📭 No hay rondas programadas",
-                font=("Segoe UI", 18),
-                bg=CARD_BG,
-                fg=TEXT_MUTED,
-            ).pack()
-            return
-
-        total_rounds = len(rounds)
-        active_round_index = None
-        
-        # Determinar ronda activa
+            return None
         for index, round_info in enumerate(rounds):
             matches = round_info.get("matches", []) or []
             if not matches:
-                active_round_index = index
-                break
+                return index
             all_done = True
             for match in matches:
                 result = match.get("result") or {}
@@ -691,125 +695,124 @@ def start_gui():
                     all_done = False
                     break
             if not all_done:
-                active_round_index = index
-                break
-        if active_round_index is None and total_rounds > 0:
-            active_round_index = total_rounds - 1
+                return index
+        return len(rounds) - 1
 
-        round_cards = []
+    ACTIVE_ROUND_MARK = " \U0001f535"
+    BENCH_MARK = "\u23f8\ufe0f "
+    EMPTY_ROUNDS_TEXT = "\U0001f4ed No hay rondas programadas"
+    MISSING_SCORE_TEXT = "\u2013"
+
+    def rebuild_rounds_layout(rounds):
+        for widget in rounds_card.winfo_children():
+            widget.destroy()
+
+        rounds_ui["rounds"] = []
+        rounds_ui["empty_state"] = None
+        rounds_ui["active_round_index"] = None
+
+        rounds_card.config(bg=CARD_BG)
+        rounds_card.columnconfigure(0, weight=1)
+
+        if not rounds:
+            empty_state = tk.Frame(rounds_card, bg=CARD_BG)
+            empty_state.pack(expand=True, fill="both", pady=40)
+            tk.Label(
+                empty_state,
+                text=EMPTY_ROUNDS_TEXT,
+                font=("Segoe UI", 18),
+                bg=CARD_BG,
+                fg=TEXT_MUTED,
+            ).pack()
+            rounds_ui["empty_state"] = empty_state
+            return
+
         for round_index, round_info in enumerate(rounds, start=1):
             round_container = tk.Frame(rounds_card, bg=BG_MAIN)
             round_container.pack(fill="x", pady=8)
-            round_cards.append(round_container)
 
-            is_active = active_round_index == (round_index - 1)
-            
-            # Tarjeta de ronda con estilo mejorado
             round_card = tk.Frame(
                 round_container,
                 bg=CARD_BG,
-                highlightbackground=FOCUS_BORDER if is_active else BORDER_LIGHT,
-                highlightthickness=2 if is_active else 1,
+                highlightbackground=BORDER_LIGHT,
+                highlightthickness=1,
                 relief="flat",
             )
             round_card.pack(fill="x")
 
-            # Header de la ronda
-            round_header_bg = ACCENT_LIGHT if is_active else ROUND_HEADER_BG
-            round_header = tk.Frame(
-                round_card,
-                bg=round_header_bg,
-            )
+            round_header = tk.Frame(round_card, bg=ROUND_HEADER_BG)
             round_header.pack(fill="x", padx=1, pady=1)
-            
-            round_status = " 🔵" if is_active else ""
-            tk.Label(
+
+            header_label = tk.Label(
                 round_header,
-                text=f"Ronda {round_index}{round_status}",
+                text=f"Ronda {round_index}",
                 font=FONT_ROUND_TITLE,
-                bg=round_header_bg,
-                fg=FOCUS_BORDER if is_active else TEXT_COLOR,
+                bg=ROUND_HEADER_BG,
+                fg=TEXT_COLOR,
                 padx=16,
                 pady=12,
                 anchor="w",
-            ).pack(fill="x")
+            )
+            header_label.pack(fill="x")
 
-            # Contenido de la ronda
             content = tk.Frame(round_card, bg=CARD_BG)
             content.pack(fill="x", padx=14, pady=12)
 
-            for match_index, match in enumerate(round_info.get("matches", []), start=1):
-                teams = match.get("teams", [[], []])
-                team_a = " + ".join(teams[0])
-                team_b = " + ".join(teams[1])
-                result = match.get("result") or {}
-                score_a = result.get("teamA")
-                score_b = result.get("teamB")
-                
-                # Determinar color de fondo
+            match_widgets = []
+            matches = round_info.get("matches", []) or []
+            for match_index in range(1, len(matches) + 1):
                 row_bg = ROW_ALT_1 if match_index % 2 == 0 else ROW_ALT_2
-                
-                # Determinar color del resultado
-                result_color = TEXT_COLOR
-                if isinstance(score_a, int) and isinstance(score_b, int):
-                    if score_a > score_b:
-                        result_color = TEAM_A_TEXT
-                    elif score_b > score_a:
-                        result_color = TEAM_B_TEXT
-                
+
                 match_frame = tk.Frame(content, bg=row_bg)
                 match_frame.pack(fill="x", pady=2)
                 match_frame.columnconfigure(0, weight=1)
 
-                # Información del partido
                 info_frame = tk.Frame(match_frame, bg=row_bg)
                 info_frame.grid(row=0, column=0, sticky="w", padx=12, pady=10)
 
-                # Número de pista
-                tk.Label(
+                pista_label = tk.Label(
                     info_frame,
-                    text=f"Pista {match_index}",
+                    text="",
                     font=FONT_MATCH_TITLE,
                     bg=row_bg,
                     fg=TEXT_MUTED,
                     anchor="w",
-                ).pack(anchor="w", pady=(0, 4))
+                )
+                pista_label.pack(anchor="w", pady=(0, 4))
 
-                # Equipos
                 teams_frame = tk.Frame(info_frame, bg=row_bg)
                 teams_frame.pack(anchor="w")
-                
-                tk.Label(
+
+                team_a_label = tk.Label(
                     teams_frame,
-                    text=team_a,
+                    text="",
                     font=FONT_MATCH_TITLE,
                     bg=row_bg,
                     fg=TEAM_A_TEXT,
-                ).pack(side="left")
-                
-                tk.Label(
+                )
+                team_a_label.pack(side="left")
+
+                vs_label = tk.Label(
                     teams_frame,
                     text=" vs ",
                     font=FONT_MATCH,
                     bg=row_bg,
                     fg=TEXT_MUTED,
-                ).pack(side="left", padx=8)
-                
-                tk.Label(
+                )
+                vs_label.pack(side="left", padx=8)
+
+                team_b_label = tk.Label(
                     teams_frame,
-                    text=team_b,
+                    text="",
                     font=FONT_MATCH_TITLE,
                     bg=row_bg,
                     fg=TEAM_B_TEXT,
-                ).pack(side="left")
-
-                # Marcador enmarcado
-                score_frame = tk.Frame(
-                    match_frame,
-                    bg=row_bg,
                 )
+                team_b_label.pack(side="left")
+
+                score_frame = tk.Frame(match_frame, bg=row_bg)
                 score_frame.grid(row=0, column=1, sticky="e", padx=12, pady=10)
-                
+
                 score_container = tk.Frame(
                     score_frame,
                     bg=CARD_BG,
@@ -817,77 +820,199 @@ def start_gui():
                     highlightthickness=1,
                 )
                 score_container.pack()
-                
-                score_text = "–"
-                if isinstance(score_a, int) and isinstance(score_b, int):
-                    score_text = f"{score_a} - {score_b}"
-                
-                tk.Label(
+
+                score_label = tk.Label(
                     score_container,
-                    text=score_text,
+                    text="",
                     font=FONT_SCORE,
                     bg=CARD_BG,
-                    fg=result_color,
+                    fg=TEXT_COLOR,
                     padx=16,
                     pady=6,
-                ).pack()
+                )
+                score_label.pack()
 
-            # Jugadores que descansan
+                match_widgets.append(
+                    {
+                        "frame": match_frame,
+                        "info_frame": info_frame,
+                        "teams_frame": teams_frame,
+                        "pista_label": pista_label,
+                        "team_a_label": team_a_label,
+                        "vs_label": vs_label,
+                        "team_b_label": team_b_label,
+                        "score_label": score_label,
+                    }
+                )
+
+            bench_frame = tk.Frame(content, bg=ACCENT_LIGHT)
+            bench_label = tk.Label(
+                bench_frame,
+                text="",
+                font=FONT_BENCH,
+                bg=ACCENT_LIGHT,
+                fg=ACCENT_DARK,
+                padx=12,
+                pady=10,
+                anchor="w",
+                justify="left",
+                wraplength=400,
+            )
+            bench_label.pack(fill="x")
+
+            rounds_ui["rounds"].append(
+                {
+                    "container": round_container,
+                    "card": round_card,
+                    "header": round_header,
+                    "header_label": header_label,
+                    "matches": match_widgets,
+                    "bench_frame": bench_frame,
+                    "bench_label": bench_label,
+                }
+            )
+
+    def update_rounds_content(rounds, *, layout_changed):
+        if not rounds:
+            rounds_ui["active_round_index"] = None
+            return
+
+        active_round_index = get_active_round_index(rounds)
+
+        for round_pos, (round_info, widgets) in enumerate(
+            zip(rounds, rounds_ui["rounds"]), start=1
+        ):
+            is_active = active_round_index == (round_pos - 1)
+            round_header_bg = ACCENT_LIGHT if is_active else ROUND_HEADER_BG
+
+            widgets["card"].config(
+                highlightbackground=FOCUS_BORDER if is_active else BORDER_LIGHT,
+                highlightthickness=2 if is_active else 1,
+            )
+            widgets["header"].config(bg=round_header_bg)
+            widgets["header_label"].config(
+                text=f"Ronda {round_pos}{ACTIVE_ROUND_MARK if is_active else ''}",
+                bg=round_header_bg,
+                fg=FOCUS_BORDER if is_active else TEXT_COLOR,
+            )
+
+            matches = round_info.get("matches", []) or []
+            for match_index, match in enumerate(matches, start=1):
+                row_bg = ROW_ALT_1 if match_index % 2 == 0 else ROW_ALT_2
+                match_widgets = widgets["matches"][match_index - 1]
+
+                match_widgets["frame"].config(bg=row_bg)
+                match_widgets["info_frame"].config(bg=row_bg)
+                match_widgets["teams_frame"].config(bg=row_bg)
+                match_widgets["pista_label"].config(
+                    text=f"Pista {match_index}",
+                    bg=row_bg,
+                    fg=TEXT_MUTED,
+                )
+
+                teams = match.get("teams") or [[], []]
+                team_a = " + ".join(teams[0])
+                team_b = " + ".join(teams[1])
+                match_widgets["team_a_label"].config(text=team_a, bg=row_bg, fg=TEAM_A_TEXT)
+                match_widgets["vs_label"].config(bg=row_bg, fg=TEXT_MUTED)
+                match_widgets["team_b_label"].config(text=team_b, bg=row_bg, fg=TEAM_B_TEXT)
+
+                result = match.get("result") or {}
+                score_a = result.get("teamA")
+                score_b = result.get("teamB")
+                result_color = TEXT_COLOR
+                if isinstance(score_a, int) and isinstance(score_b, int):
+                    if score_a > score_b:
+                        result_color = TEAM_A_TEXT
+                    elif score_b > score_a:
+                        result_color = TEAM_B_TEXT
+
+                score_text = MISSING_SCORE_TEXT
+                if isinstance(score_a, int) and isinstance(score_b, int):
+                    score_text = f"{score_a} - {score_b}"
+
+                match_widgets["score_label"].config(text=score_text, fg=result_color)
+
             bench = round_info.get("bench") or []
+            bench_frame = widgets["bench_frame"]
             if bench:
-                bench_frame = tk.Frame(content, bg=ACCENT_LIGHT)
-                bench_frame.pack(fill="x", pady=2)
-                
                 bench_label = "Descansa" if len(bench) == 1 else "Descansan"
-                tk.Label(
-                    bench_frame,
-                    text=f"⏸️ {bench_label}: {', '.join(bench)}",
-                    font=FONT_BENCH,
-                    bg=ACCENT_LIGHT,
+                widgets["bench_label"].config(
+                    text=f"{BENCH_MARK}{bench_label}: {', '.join(bench)}",
                     fg=ACCENT_DARK,
-                    padx=12,
-                    pady=10,
-                    anchor="w",
-                    justify="left",
-                    wraplength=400,
-                ).pack(fill="x")
+                )
+                if not bench_frame.winfo_ismapped():
+                    bench_frame.pack(fill="x", pady=2)
+            else:
+                if bench_frame.winfo_ismapped():
+                    bench_frame.pack_forget()
 
-        # Auto-scroll a la ronda activa
-        if active_round_index is not None and round_cards:
+        should_scroll = layout_changed or (
+            active_round_index != rounds_ui["active_round_index"]
+        )
+        rounds_ui["active_round_index"] = active_round_index
+
+        if should_scroll and rounds_ui["rounds"]:
             target_index = max(active_round_index - 1, 0)
             canvas = getattr(rounds_card, "_scroll_canvas", None)
             if canvas is not None:
                 rounds_card.update_idletasks()
                 canvas.update_idletasks()
-                target_widget = round_cards[target_index]
+                target_widget = rounds_ui["rounds"][target_index]["container"]
                 bbox = canvas.bbox("all")
                 if bbox:
                     scroll_height = bbox[3] - bbox[1]
                     if scroll_height > 0:
                         target_y = target_widget.winfo_y()
-                        canvas.yview_moveto(max(0.0, min(1.0, target_y / scroll_height)))
+                        canvas.yview_moveto(
+                            max(0.0, min(1.0, target_y / scroll_height))
+                        )
 
-    def render_scoreboard(stats):
+    def render_rounds(tournament):
+        rounds = tournament.get("rounds", []) or []
+        data_sig = build_rounds_data_signature(rounds)
+        if data_sig == rounds_ui["data_sig"]:
+            return
+
+        layout_sig = build_rounds_layout_signature(rounds)
+        layout_changed = layout_sig != rounds_ui["layout_sig"]
+        if layout_changed:
+            rebuild_rounds_layout(rounds)
+            rounds_ui["layout_sig"] = layout_sig
+
+        update_rounds_content(rounds, layout_changed=layout_changed)
+        rounds_ui["data_sig"] = data_sig
+
+    scoreboard_ui = {
+        "initialized": False,
+        "rows": [],
+        "data_sig": None,
+    }
+
+    SCOREBOARD_HEADERS = ["#", "JUGADOR", "PG", "PP", "PJ", "PF", "PC"]
+
+    def ensure_scoreboard_header():
+        if scoreboard_ui["initialized"]:
+            return
+        scoreboard_ui["initialized"] = True
         for widget in scoreboard_card.winfo_children():
             widget.destroy()
-        
         scoreboard_card.config(bg=CARD_BG)
-        
-        # Encabezados de tabla mejorados
-        headers = ["#", "JUGADOR", "PG", "PP", "PJ", "PF", "PC"]
-        for col_index, text in enumerate(headers):
+        for col_index, text in enumerate(SCOREBOARD_HEADERS):
             is_name = col_index == 1
             anchor = "w" if is_name else "center"
             padx = 16 if is_name else 8
-            
+
             header_cell = tk.Frame(
                 scoreboard_card,
                 bg=TABLE_HEADER_BG,
                 highlightbackground=BORDER,
                 highlightthickness=1,
             )
-            header_cell.grid(row=0, column=col_index, sticky="nsew", padx=(0, 0), pady=(0, 2))
-            
+            header_cell.grid(
+                row=0, column=col_index, sticky="nsew", padx=(0, 0), pady=(0, 2)
+            )
+
             tk.Label(
                 header_cell,
                 text=text,
@@ -898,70 +1023,80 @@ def start_gui():
                 pady=10,
                 anchor=anchor,
             ).pack(fill="both", expand=True)
-            
+
             scoreboard_card.grid_columnconfigure(
                 col_index, weight=3 if is_name else 1
             )
 
-        # Función de ordenación
+    def build_scoreboard_rows(stats):
         def _scoreboard_sort_key(item):
             player, stat = item
             return (
                 -stat["wins"],
                 stat["losses"],
-                -(stat["points_for"] - stat["points_against"]),  # Diferencia de puntos
+                -(stat["points_for"] - stat["points_against"]),
                 -stat["points_for"],
                 player.lower(),
             )
 
-        # Filas de datos con mejor visualización
         sorted_stats = sorted(stats.items(), key=_scoreboard_sort_key)
+        rows = []
         for row_index, (player, stat) in enumerate(sorted_stats, start=1):
-            values = [
-                row_index,
-                player,
-                stat["wins"],
-                stat["losses"],
-                stat["played"],
-                stat["points_for"],
-                stat["points_against"],
-            ]
-            
-            # Color de fondo alternado con mejor contraste
+            rows.append(
+                [
+                    row_index,
+                    player,
+                    stat["wins"],
+                    stat["losses"],
+                    stat["played"],
+                    stat["points_for"],
+                    stat["points_against"],
+                ]
+            )
+        return rows
+
+    def ensure_scoreboard_row(row_index):
+        while len(scoreboard_ui["rows"]) < row_index:
+            row_widgets = []
+            for _col_index in range(len(SCOREBOARD_HEADERS)):
+                cell_frame = tk.Frame(
+                    scoreboard_card,
+                    bg=CARD_BG,
+                    highlightbackground=BORDER_LIGHT,
+                    highlightthickness=1,
+                )
+                label = tk.Label(
+                    cell_frame,
+                    text="",
+                    font=FONT_TABLE,
+                    bg=CARD_BG,
+                    fg=TABLE_HEADER_TEXT,
+                    padx=8,
+                    pady=8,
+                )
+                label.pack(fill="both", expand=True)
+                row_widgets.append((cell_frame, label))
+            scoreboard_ui["rows"].append(row_widgets)
+        return scoreboard_ui["rows"][row_index - 1]
+
+    def update_scoreboard_rows(rows):
+        for row_index, values in enumerate(rows, start=1):
             row_bg = ROW_ALT_1 if row_index % 2 == 0 else ROW_ALT_2
-            
-            # Destacar top 3
             if row_index <= 3:
                 if row_index == 1:
-                    row_bg = "#FFF3CD"  # Oro claro
+                    row_bg = "#FFF3CD"
                 elif row_index == 2:
-                    row_bg = "#E2E3E5"  # Plata claro
+                    row_bg = "#E2E3E5"
                 elif row_index == 3:
-                    row_bg = "#F8D7DA"  # Bronce claro
-            
+                    row_bg = "#F8D7DA"
+
+            row_widgets = ensure_scoreboard_row(row_index)
             for col_index, value in enumerate(values):
                 is_name = col_index == 1
                 anchor = "w" if is_name else "center"
                 padx = 16 if is_name else 8
-                
-                # Determinar color del texto
-                text_color = TEXT_COLOR
-                if col_index == 2:  # PG
-                    text_color = SUCCESS_COLOR if value > 0 else TEXT_MUTED
-                elif col_index == 3:  # PP
-                    text_color = DANGER_COLOR if value > 0 else TEXT_MUTED
-                elif col_index == 0 and row_index <= 3:  # Posición top 3
-                    if row_index == 1:
-                        text_color = "#FFC107"  # Oro
-                    elif row_index == 2:
-                        text_color = TEXT_MUTED  # Plata
-                    elif row_index == 3:
-                        text_color = "#DC3545"  # Bronce
-
-                text_color = TABLE_HEADER_TEXT
-                
-                cell_frame = tk.Frame(
-                    scoreboard_card,
+                cell_frame, label = row_widgets[col_index]
+                cell_frame.config(
                     bg=row_bg,
                     highlightbackground=BORDER_LIGHT,
                     highlightthickness=1,
@@ -971,25 +1106,69 @@ def start_gui():
                     column=col_index,
                     sticky="nsew",
                     padx=(0, 0),
-                    pady=(0, 0)
+                    pady=(0, 0),
                 )
-                
-                tk.Label(
-                    cell_frame,
+                label.config(
                     text=value,
-                    font=FONT_TABLE,
                     bg=row_bg,
-                    fg=text_color,
+                    fg=TABLE_HEADER_TEXT,
                     padx=padx,
                     pady=8,
                     anchor=anchor,
-                ).pack(fill="both", expand=True)
+                )
+
+        for extra_index in range(len(rows) + 1, len(scoreboard_ui["rows"]) + 1):
+            for cell_frame, _label in scoreboard_ui["rows"][extra_index - 1]:
+                cell_frame.grid_remove()
+
+    def render_scoreboard(stats):
+        rows = build_scoreboard_rows(stats)
+        data_sig = tuple(tuple(row) for row in rows)
+        if data_sig == scoreboard_ui["data_sig"]:
+            return
+
+        ensure_scoreboard_header()
+        update_scoreboard_rows(rows)
+        scoreboard_ui["data_sig"] = data_sig
+
+    dashboard_state = {
+        "tournament_name": None,
+        "rounds_sig": None,
+        "players_sig": None,
+    }
 
     def update_dashboard(tournament):
         tournament_name = tournament.get("name") or "Torneo"
-        tournament_title.config(text=tournament_name)
+        if tournament_name != dashboard_state["tournament_name"]:
+            tournament_title.config(text=tournament_name)
+            dashboard_state["tournament_name"] = tournament_name
         render_rounds(tournament)
-        render_scoreboard(compute_player_stats(tournament))
+        rounds_sig = rounds_ui["data_sig"]
+        players_sig = tuple(tournament.get("players", []) or [])
+        if (
+            rounds_sig != dashboard_state["rounds_sig"]
+            or players_sig != dashboard_state["players_sig"]
+        ):
+            render_scoreboard(compute_player_stats(tournament))
+            dashboard_state["rounds_sig"] = rounds_sig
+            dashboard_state["players_sig"] = players_sig
+
+    pending_render = {"scheduled": False, "tournament": None}
+
+    def schedule_dashboard_render(tournament):
+        pending_render["tournament"] = tournament
+        if pending_render["scheduled"]:
+            return
+        pending_render["scheduled"] = True
+
+        def _apply():
+            pending_render["scheduled"] = False
+            latest = pending_render["tournament"]
+            if latest is None:
+                return
+            update_dashboard(latest)
+
+        root.after_idle(_apply)
 
     # ============================
     # POLLING DE ACTUALIZACIONES
@@ -1003,7 +1182,7 @@ def start_gui():
             if not dashboard_frame.winfo_ismapped():
                 qr_frame.pack_forget()
                 dashboard_frame.pack(expand=True, fill="both")
-            update_dashboard(tournament)
+            schedule_dashboard_render(tournament)
         root.after(500, poll_updates)
 
     poll_updates()

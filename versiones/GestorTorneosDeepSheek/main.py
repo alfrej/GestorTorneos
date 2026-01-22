@@ -64,6 +64,11 @@ FONT_TABLE_HEADER = (FONT_FAMILY, 16, "bold")
 FONT_TABLE = (FONT_FAMILY, 15)
 FONT_LEGEND = (FONT_FAMILY, 12)
 
+# Variables globales para caching
+_qr_image_cache = None
+_logo_cache = {}
+_current_stats_cache = {"data": None, "hash": None}
+
 def set_current_tournament(data):
     with _state_lock:
         _tournament_state["data"] = copy.deepcopy(data)
@@ -106,18 +111,31 @@ def get_local_ip():
     return ip
 
 def create_qr_image(data, size=420):
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_M,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(data)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color=TEXT_COLOR, back_color=CARD_BG).resize(
-        (size, size)
-    )
-    return ImageTk.PhotoImage(img)
+    global _qr_image_cache
+    if _qr_image_cache is None or _qr_image_cache[0] != (data, size):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color=TEXT_COLOR, back_color=CARD_BG).resize(
+            (size, size)
+        )
+        _qr_image_cache = ((data, size), ImageTk.PhotoImage(img))
+    return _qr_image_cache[1]
+
+def load_logo_image(path, size):
+    key = f"{path}_{size[0]}_{size[1]}"
+    if key not in _logo_cache:
+        if os.path.exists(path):
+            logo_image = Image.open(path).resize(size)
+            _logo_cache[key] = ImageTk.PhotoImage(logo_image)
+        else:
+            _logo_cache[key] = None
+    return _logo_cache[key]
 
 def start_web_server():
     app = Flask(__name__, template_folder="web/templates")
@@ -321,25 +339,26 @@ def start_gui():
 
     root.bind("<Escape>", exit_fullscreen)
 
+    # Configurar para mejor rendimiento
+    root.update_idletasks()
+    
     # Contenedor principal
     container = tk.Frame(root, bg=BG_MAIN)
     container.pack(expand=True, fill="both")
 
     # ============================
-    # PANTALLA QR - SIN ICONOS
+    # PANTALLA QR - OPTIMIZADA
     # ============================
     qr_frame = tk.Frame(container, bg=BG_MAIN)
     qr_frame.pack(expand=True)
 
-    # Logo
+    # Logo con caching
     logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+    logo_photo = load_logo_image(logo_path, (200, 200))
+    dashboard_logo_photo = load_logo_image(logo_path, (64, 64))
+    
     logo_label = None
-    logo_photo = None
-    dashboard_logo_photo = None
-    if os.path.exists(logo_path):
-        logo_image = Image.open(logo_path)
-        logo_photo = ImageTk.PhotoImage(logo_image.resize((200, 200)))
-        dashboard_logo_photo = ImageTk.PhotoImage(logo_image.resize((64, 64)))
+    if logo_photo is not None:
         logo_label = tk.Label(container, image=logo_photo, bg=BG_MAIN)
         logo_label.image = logo_photo
 
@@ -363,11 +382,10 @@ def start_gui():
         fg=TEXT_MUTED,
     ).pack(pady=(10, 0))
 
-    # QR con efecto de tarjeta moderna
+    # QR con caching
     qr_container = tk.Frame(qr_frame, bg=BG_MAIN)
     qr_container.pack(pady=20)
     
-    # Tarjeta con sombra sutil
     qr_card = tk.Frame(
         qr_container,
         bg=CARD_BG,
@@ -382,7 +400,7 @@ def start_gui():
     qr_label.image = qr_image
     qr_label.pack(padx=20, pady=20)
 
-    # URL con estilo moderno sin icono
+    # URL sin icono
     url_container = tk.Frame(qr_frame, bg=BG_MAIN)
     url_container.pack(pady=(20, 0))
     
@@ -402,7 +420,7 @@ def start_gui():
     )
     url_display.pack(side="left", padx=(10, 0))
     
-    tk.Label(
+    url_text = tk.Label(
         url_display,
         text=url,
         font=FONT_URL,
@@ -411,7 +429,8 @@ def start_gui():
         padx=16,
         pady=8,
         cursor="hand2",
-    ).pack()
+    )
+    url_text.pack()
     
     def open_url(event):
         import webbrowser
@@ -424,19 +443,17 @@ def start_gui():
         logo_label.place(relx=1.0, rely=1.0, anchor="se", x=-20, y=-20)
 
     # Versión sin icono
-    version_container = tk.Frame(container, bg=BG_MAIN)
-    version_container.place(relx=0.0, rely=1.0, anchor="sw", x=20, y=-10)
-    
-    tk.Label(
-        version_container,
+    version_label = tk.Label(
+        container,
         text=f"Versión {__version__}",
         font=FONT_VERSION,
         bg=BG_MAIN,
         fg=TEXT_MUTED,
-    ).pack(side="left", padx=(4, 0))
+    )
+    version_label.place(relx=0.0, rely=1.0, anchor="sw", x=20, y=-10)
 
     # ============================
-    # DASHBOARD - SIN ICONOS EN TÍTULOS
+    # DASHBOARD - OPTIMIZADO
     # ============================
     dashboard_frame = tk.Frame(container, bg=BG_MAIN)
     dashboard_frame.pack_forget()
@@ -464,14 +481,14 @@ def start_gui():
     )
     tournament_title.pack(side="left", padx=40)
 
-    # Paneles principales con mejor distribución
+    # Paneles principales
     panels = tk.Frame(dashboard_frame, bg=BG_MAIN)
     panels.pack(expand=True, fill="both", padx=40, pady=20)
     panels.grid_columnconfigure(0, weight=5, uniform="panels")
     panels.grid_columnconfigure(1, weight=7, uniform="panels")
     panels.grid_rowconfigure(0, weight=1)
 
-    # Panel de Rondas - sin icono
+    # Panel de Rondas
     rounds_panel = tk.Frame(panels, bg=BG_MAIN)
     rounds_panel.grid(row=0, column=0, sticky="nsew", padx=(0, 20))
     
@@ -486,7 +503,7 @@ def start_gui():
         fg=TEXT_COLOR,
     ).pack(side="left")
 
-    # Panel de Clasificación - sin icono
+    # Panel de Clasificación
     scoreboard_panel = tk.Frame(panels, bg=BG_MAIN)
     scoreboard_panel.grid(row=0, column=1, sticky="nsew", padx=(20, 0))
     
@@ -501,7 +518,7 @@ def start_gui():
         fg=TEXT_COLOR,
     ).pack(side="left")
 
-    # Función para crear tarjetas desplazables mejoradas
+    # Función para crear tarjetas desplazables optimizada
     def build_scrollable_card(parent, bg_color=CARD_BG):
         container = tk.Frame(parent, bg=BG_MAIN)
         container.pack(expand=True, fill="both")
@@ -556,7 +573,7 @@ def start_gui():
     rounds_card = build_scrollable_card(rounds_panel)
     scoreboard_card = build_scrollable_card(scoreboard_panel)
 
-    # Leyenda mejorada sin iconos
+    # Leyenda optimizada
     legend_frame = tk.Frame(scoreboard_panel, bg=BG_MAIN)
     legend_frame.pack(fill="x", pady=(12, 0))
     
@@ -568,33 +585,54 @@ def start_gui():
         ("PC", "Puntos en contra", WARNING_COLOR),
     ]
     
+    legend_labels = []
     for i, (abbr, desc, color) in enumerate(legend_items):
         item_frame = tk.Frame(legend_frame, bg=BG_MAIN)
         item_frame.pack(side="left", padx=(0 if i == 0 else 16))
         
-        tk.Label(
+        lbl_abbr = tk.Label(
             item_frame,
             text=abbr,
             font=("Segoe UI", 11, "bold"),
             bg=BG_MAIN,
             fg=color,
-        ).pack(side="left")
+        )
+        lbl_abbr.pack(side="left")
         
-        tk.Label(
+        lbl_desc = tk.Label(
             item_frame,
             text=f"={desc}",
             font=FONT_LEGEND,
             bg=BG_MAIN,
             fg=TEXT_MUTED,
-        ).pack(side="left", padx=(4, 0))
+        )
+        lbl_desc.pack(side="left", padx=(4, 0))
+        
+        legend_labels.append((lbl_abbr, lbl_desc))
 
     # ============================
-    # FUNCIONES DE RENDERIZADO MEJORADAS
+    # FUNCIONES DE RENDERIZADO OPTIMIZADAS
     # ============================
 
     def compute_player_stats(tournament):
+        """Calcula estadísticas con caching para evitar recálculos innecesarios"""
+        import hashlib
+        import json as json_module
+        
+        # Crear un hash del torneo para verificar si cambió
+        tournament_str = json_module.dumps(tournament, sort_keys=True)
+        tournament_hash = hashlib.md5(tournament_str.encode()).hexdigest()
+        
+        # Verificar cache
+        if (_current_stats_cache["data"] is not None and 
+            _current_stats_cache["hash"] == tournament_hash):
+            return _current_stats_cache["data"]
+        
         stats = {}
-        for player in tournament.get("players", []):
+        players = tournament.get("players", [])
+        
+        # Inicializar estadísticas
+        for player in players:
             stats[player] = {
                 "wins": 0,
                 "losses": 0,
@@ -602,29 +640,32 @@ def start_gui():
                 "points_for": 0,
                 "points_against": 0,
             }
+        
+        # Procesar rondas
         for round_info in tournament.get("rounds", []):
             for match in round_info.get("matches", []):
                 result = match.get("result") or {}
                 score_a = result.get("teamA")
                 score_b = result.get("teamB")
+                
                 if not isinstance(score_a, int) or not isinstance(score_b, int):
                     continue
+                
                 team_a = match.get("teams", [[], []])[0]
                 team_b = match.get("teams", [[], []])[1]
                 team_a_wins = score_a > score_b
                 team_b_wins = score_b > score_a
 
+                # Procesar equipo A
                 for player in team_a:
-                    stats.setdefault(
-                        player,
-                        {
+                    if player not in stats:
+                        stats[player] = {
                             "wins": 0,
                             "losses": 0,
                             "played": 0,
                             "points_for": 0,
                             "points_against": 0,
-                        },
-                    )
+                        }
                     entry = stats[player]
                     entry["played"] += 1
                     entry["points_for"] += score_a
@@ -634,17 +675,16 @@ def start_gui():
                     elif team_b_wins:
                         entry["losses"] += 1
 
+                # Procesar equipo B
                 for player in team_b:
-                    stats.setdefault(
-                        player,
-                        {
+                    if player not in stats:
+                        stats[player] = {
                             "wins": 0,
                             "losses": 0,
                             "played": 0,
                             "points_for": 0,
                             "points_against": 0,
-                        },
-                    )
+                        }
                     entry = stats[player]
                     entry["played"] += 1
                     entry["points_for"] += score_b
@@ -653,38 +693,63 @@ def start_gui():
                         entry["wins"] += 1
                     elif team_a_wins:
                         entry["losses"] += 1
+        
+        # Actualizar cache
+        _current_stats_cache["data"] = stats
+        _current_stats_cache["hash"] = tournament_hash
+        
         return stats
 
+    # Variables para tracking de widgets y caching
+    _rounds_widgets = []
+    _scoreboard_widgets = []
+
+    def clear_widgets(widget_list):
+        """Elimina widgets de manera eficiente"""
+        for widget in widget_list:
+            try:
+                widget.destroy()
+            except:
+                pass
+        widget_list.clear()
+
     def render_rounds(tournament):
-        for widget in rounds_card.winfo_children():
-            widget.destroy()
+        """Renderiza las rondas de manera optimizada"""
+        nonlocal _rounds_widgets
+        
+        # Limpiar widgets anteriores
+        clear_widgets(_rounds_widgets)
         
         rounds_card.config(bg=CARD_BG)
-        rounds_card.columnconfigure(0, weight=1)
-
+        
         rounds = tournament.get("rounds", [])
         if not rounds:
-            empty_state = tk.Frame(rounds_card, bg=CARD_BG)
-            empty_state.pack(expand=True, fill="both", pady=40)
+            empty_frame = tk.Frame(rounds_card, bg=CARD_BG)
+            empty_frame.pack(expand=True, fill="both", pady=40)
+            _rounds_widgets.append(empty_frame)
             
-            tk.Label(
-                empty_state,
+            lbl_empty = tk.Label(
+                empty_frame,
                 text="No hay rondas programadas",
                 font=("Segoe UI", 18),
                 bg=CARD_BG,
                 fg=TEXT_MUTED,
-            ).pack()
+            )
+            lbl_empty.pack()
+            _rounds_widgets.append(lbl_empty)
             return
 
         total_rounds = len(rounds)
         active_round_index = None
         
-        # Determinar ronda activa
+        # Determinar ronda activa de manera eficiente
         for index, round_info in enumerate(rounds):
             matches = round_info.get("matches", []) or []
             if not matches:
                 active_round_index = index
                 break
+            
+            # Verificar si todos los partidos tienen resultado
             all_done = True
             for match in matches:
                 result = match.get("result") or {}
@@ -693,21 +758,25 @@ def start_gui():
                 if not isinstance(score_a, int) or not isinstance(score_b, int):
                     all_done = False
                     break
+            
             if not all_done:
                 active_round_index = index
                 break
+        
         if active_round_index is None and total_rounds > 0:
             active_round_index = total_rounds - 1
 
-        round_cards = []
+        round_containers = []
         for round_index, round_info in enumerate(rounds, start=1):
+            # Contenedor de ronda
             round_container = tk.Frame(rounds_card, bg=BG_MAIN)
             round_container.pack(fill="x", pady=8)
-            round_cards.append(round_container)
+            _rounds_widgets.append(round_container)
+            round_containers.append(round_container)
 
             is_active = active_round_index == (round_index - 1)
             
-            # Tarjeta de ronda con estilo mejorado
+            # Tarjeta de ronda
             round_card = tk.Frame(
                 round_container,
                 bg=CARD_BG,
@@ -716,20 +785,22 @@ def start_gui():
                 relief="flat",
             )
             round_card.pack(fill="x")
+            _rounds_widgets.append(round_card)
 
-            # Header de la ronda sin icono
+            # Header de la ronda
             round_header_bg = ACCENT_LIGHT if is_active else ROUND_HEADER_BG
             round_header = tk.Frame(
                 round_card,
                 bg=round_header_bg,
             )
             round_header.pack(fill="x", padx=1, pady=1)
+            _rounds_widgets.append(round_header)
             
             round_status_text = f"Ronda {round_index}"
             if is_active:
                 round_status_text = f"Ronda {round_index} (ACTUAL)"
                 
-            tk.Label(
+            lbl_round_title = tk.Label(
                 round_header,
                 text=round_status_text,
                 font=FONT_ROUND_TITLE,
@@ -738,12 +809,16 @@ def start_gui():
                 padx=16,
                 pady=12,
                 anchor="w",
-            ).pack(fill="x")
+            )
+            lbl_round_title.pack(fill="x")
+            _rounds_widgets.append(lbl_round_title)
 
             # Contenido de la ronda
             content = tk.Frame(round_card, bg=CARD_BG)
             content.pack(fill="x", padx=14, pady=12)
+            _rounds_widgets.append(content)
 
+            # Renderizar partidos
             for match_index, match in enumerate(round_info.get("matches", []), start=1):
                 teams = match.get("teams", [[], []])
                 team_a = " + ".join(teams[0])
@@ -752,10 +827,10 @@ def start_gui():
                 score_a = result.get("teamA")
                 score_b = result.get("teamB")
                 
-                # Determinar color de fondo
+                # Color de fondo alternado
                 row_bg = ROW_ALT_1 if match_index % 2 == 0 else ROW_ALT_2
                 
-                # Determinar color del resultado
+                # Color del resultado
                 result_color = TEXT_COLOR
                 if isinstance(score_a, int) and isinstance(score_b, int):
                     if score_a > score_b:
@@ -763,58 +838,73 @@ def start_gui():
                     elif score_b > score_a:
                         result_color = TEAM_B_TEXT
                 
+                # Frame del partido
                 match_frame = tk.Frame(content, bg=row_bg)
                 match_frame.pack(fill="x", pady=2)
+                _rounds_widgets.append(match_frame)
+                
+                # Configurar grid
                 match_frame.columnconfigure(0, weight=1)
 
                 # Información del partido
                 info_frame = tk.Frame(match_frame, bg=row_bg)
                 info_frame.grid(row=0, column=0, sticky="w", padx=12, pady=10)
+                _rounds_widgets.append(info_frame)
 
                 # Número de pista
-                tk.Label(
+                lbl_court = tk.Label(
                     info_frame,
                     text=f"Pista {match_index}",
                     font=FONT_MATCH_TITLE,
                     bg=row_bg,
                     fg=TEXT_MUTED,
                     anchor="w",
-                ).pack(anchor="w", pady=(0, 4))
+                )
+                lbl_court.pack(anchor="w", pady=(0, 4))
+                _rounds_widgets.append(lbl_court)
 
                 # Equipos
                 teams_frame = tk.Frame(info_frame, bg=row_bg)
                 teams_frame.pack(anchor="w")
+                _rounds_widgets.append(teams_frame)
                 
-                tk.Label(
+                lbl_team_a = tk.Label(
                     teams_frame,
                     text=team_a,
                     font=FONT_MATCH_TITLE,
                     bg=row_bg,
                     fg=TEAM_A_TEXT,
-                ).pack(side="left")
+                )
+                lbl_team_a.pack(side="left")
+                _rounds_widgets.append(lbl_team_a)
                 
-                tk.Label(
+                lbl_vs = tk.Label(
                     teams_frame,
                     text=" vs ",
                     font=FONT_MATCH,
                     bg=row_bg,
                     fg=TEXT_MUTED,
-                ).pack(side="left", padx=8)
+                )
+                lbl_vs.pack(side="left", padx=8)
+                _rounds_widgets.append(lbl_vs)
                 
-                tk.Label(
+                lbl_team_b = tk.Label(
                     teams_frame,
                     text=team_b,
                     font=FONT_MATCH_TITLE,
                     bg=row_bg,
                     fg=TEAM_B_TEXT,
-                ).pack(side="left")
+                )
+                lbl_team_b.pack(side="left")
+                _rounds_widgets.append(lbl_team_b)
 
-                # Marcador enmarcado
+                # Marcador
                 score_frame = tk.Frame(
                     match_frame,
                     bg=row_bg,
                 )
                 score_frame.grid(row=0, column=1, sticky="e", padx=12, pady=10)
+                _rounds_widgets.append(score_frame)
                 
                 score_container = tk.Frame(
                     score_frame,
@@ -823,12 +913,13 @@ def start_gui():
                     highlightthickness=1,
                 )
                 score_container.pack()
+                _rounds_widgets.append(score_container)
                 
                 score_text = "–"
                 if isinstance(score_a, int) and isinstance(score_b, int):
                     score_text = f"{score_a} - {score_b}"
                 
-                tk.Label(
+                lbl_score = tk.Label(
                     score_container,
                     text=score_text,
                     font=FONT_SCORE,
@@ -836,16 +927,19 @@ def start_gui():
                     fg=result_color,
                     padx=16,
                     pady=6,
-                ).pack()
+                )
+                lbl_score.pack()
+                _rounds_widgets.append(lbl_score)
 
-            # Jugadores que descansan sin icono
+            # Jugadores que descansan
             bench = round_info.get("bench") or []
             if bench:
                 bench_frame = tk.Frame(content, bg=ACCENT_LIGHT)
                 bench_frame.pack(fill="x", pady=2)
+                _rounds_widgets.append(bench_frame)
                 
                 bench_label = "Descansa" if len(bench) == 1 else "Descansan"
-                tk.Label(
+                lbl_bench = tk.Label(
                     bench_frame,
                     text=f"{bench_label}: {', '.join(bench)}",
                     font=FONT_BENCH,
@@ -856,31 +950,43 @@ def start_gui():
                     anchor="w",
                     justify="left",
                     wraplength=400,
-                ).pack(fill="x")
+                )
+                lbl_bench.pack(fill="x")
+                _rounds_widgets.append(lbl_bench)
 
         # Auto-scroll a la ronda activa
-        if active_round_index is not None and round_cards:
+        if active_round_index is not None and round_containers:
             target_index = max(active_round_index - 1, 0)
             canvas = getattr(rounds_card, "_scroll_canvas", None)
             if canvas is not None:
-                rounds_card.update_idletasks()
-                canvas.update_idletasks()
-                target_widget = round_cards[target_index]
-                bbox = canvas.bbox("all")
-                if bbox:
-                    scroll_height = bbox[3] - bbox[1]
-                    if scroll_height > 0:
-                        target_y = target_widget.winfo_y()
-                        canvas.yview_moveto(max(0.0, min(1.0, target_y / scroll_height)))
+                # Usar after para evitar bloqueo
+                root.after(100, lambda: scroll_to_round(canvas, round_containers, target_index))
+
+    def scroll_to_round(canvas, containers, target_index):
+        """Scroll a la ronda objetivo de manera asíncrona"""
+        if target_index < len(containers):
+            target_widget = containers[target_index]
+            canvas.update_idletasks()
+            bbox = canvas.bbox("all")
+            if bbox:
+                scroll_height = bbox[3] - bbox[1]
+                if scroll_height > 0:
+                    target_y = target_widget.winfo_y()
+                    canvas.yview_moveto(max(0.0, min(1.0, target_y / scroll_height)))
 
     def render_scoreboard(stats):
-        for widget in scoreboard_card.winfo_children():
-            widget.destroy()
+        """Renderiza la tabla de clasificación optimizada"""
+        nonlocal _scoreboard_widgets
+        
+        # Limpiar widgets anteriores
+        clear_widgets(_scoreboard_widgets)
         
         scoreboard_card.config(bg=CARD_BG)
         
-        # Encabezados de tabla mejorados
+        # Encabezados de tabla
         headers = ["#", "JUGADOR", "PG", "PP", "PJ", "PF", "PC"]
+        header_frames = []
+        
         for col_index, text in enumerate(headers):
             is_name = col_index == 1
             anchor = "w" if is_name else "center"
@@ -893,8 +999,10 @@ def start_gui():
                 highlightthickness=1,
             )
             header_cell.grid(row=0, column=col_index, sticky="nsew", padx=(0, 0), pady=(0, 2))
+            _scoreboard_widgets.append(header_cell)
+            header_frames.append(header_cell)
             
-            tk.Label(
+            lbl_header = tk.Label(
                 header_cell,
                 text=text,
                 font=FONT_TABLE_HEADER,
@@ -903,25 +1011,28 @@ def start_gui():
                 padx=padx,
                 pady=10,
                 anchor=anchor,
-            ).pack(fill="both", expand=True)
+            )
+            lbl_header.pack(fill="both", expand=True)
+            _scoreboard_widgets.append(lbl_header)
             
             scoreboard_card.grid_columnconfigure(
                 col_index, weight=3 if is_name else 1
             )
 
-        # Función de ordenación
+        # Ordenar estadísticas
         def _scoreboard_sort_key(item):
             player, stat = item
             return (
                 -stat["wins"],
                 stat["losses"],
-                -(stat["points_for"] - stat["points_against"]),  # Diferencia de puntos
+                -(stat["points_for"] - stat["points_against"]),
                 -stat["points_for"],
                 player.lower(),
             )
 
-        # Filas de datos con mejor visualización
         sorted_stats = sorted(stats.items(), key=_scoreboard_sort_key)
+        
+        # Renderizar filas
         for row_index, (player, stat) in enumerate(sorted_stats, start=1):
             values = [
                 row_index,
@@ -933,37 +1044,39 @@ def start_gui():
                 stat["points_against"],
             ]
             
-            # Color de fondo alternado con mejor contraste
+            # Color de fondo
             row_bg = ROW_ALT_1 if row_index % 2 == 0 else ROW_ALT_2
             
             # Destacar top 3
             if row_index <= 3:
                 if row_index == 1:
-                    row_bg = "#FFF3CD"  # Oro claro
+                    row_bg = "#FFF3CD"
                 elif row_index == 2:
-                    row_bg = "#E2E3E5"  # Plata claro
+                    row_bg = "#E2E3E5"
                 elif row_index == 3:
-                    row_bg = "#F8D7DA"  # Bronce claro
+                    row_bg = "#F8D7DA"
             
+            # Crear celdas
             for col_index, value in enumerate(values):
                 is_name = col_index == 1
                 anchor = "w" if is_name else "center"
                 padx = 16 if is_name else 8
                 
-                # Determinar color del texto
+                # Color del texto
                 text_color = TEXT_COLOR
                 if col_index == 2:  # PG
                     text_color = SUCCESS_COLOR if value > 0 else TEXT_MUTED
                 elif col_index == 3:  # PP
                     text_color = DANGER_COLOR if value > 0 else TEXT_MUTED
-                elif col_index == 0 and row_index <= 3:  # Posición top 3
+                elif col_index == 0 and row_index <= 3:  # Top 3
                     if row_index == 1:
-                        text_color = "#FFC107"  # Oro
+                        text_color = "#FFC107"
                     elif row_index == 2:
-                        text_color = TEXT_MUTED  # Plata
+                        text_color = TEXT_MUTED
                     elif row_index == 3:
-                        text_color = "#DC3545"  # Bronce
+                        text_color = "#DC3545"
                 
+                # Crear celda
                 cell_frame = tk.Frame(
                     scoreboard_card,
                     bg=row_bg,
@@ -977,8 +1090,9 @@ def start_gui():
                     padx=(0, 0),
                     pady=(0, 0)
                 )
+                _scoreboard_widgets.append(cell_frame)
                 
-                tk.Label(
+                lbl_cell = tk.Label(
                     cell_frame,
                     text=value,
                     font=FONT_TABLE,
@@ -987,30 +1101,51 @@ def start_gui():
                     padx=padx,
                     pady=8,
                     anchor=anchor,
-                ).pack(fill="both", expand=True)
+                )
+                lbl_cell.pack(fill="both", expand=True)
+                _scoreboard_widgets.append(lbl_cell)
 
     def update_dashboard(tournament):
+        """Actualiza el dashboard optimizado"""
         tournament_name = tournament.get("name") or "Torneo"
         tournament_title.config(text=tournament_name)
-        render_rounds(tournament)
-        render_scoreboard(compute_player_stats(tournament))
+        
+        # Renderizar asíncronamente para evitar bloqueo
+        root.after(10, lambda: render_rounds(tournament))
+        root.after(20, lambda: render_scoreboard(compute_player_stats(tournament)))
 
     # ============================
-    # POLLING DE ACTUALIZACIONES
+    # POLLING DE ACTUALIZACIONES OPTIMIZADO
     # ============================
     last_version = {"value": 0}
+    _update_in_progress = False
 
     def poll_updates():
+        """Polling optimizado con throttling"""
+        nonlocal _update_in_progress
+        
+        if _update_in_progress:
+            root.after(500, poll_updates)
+            return
+            
         tournament, version = get_current_tournament()
+        
         if tournament and version != last_version["value"]:
             last_version["value"] = version
             if not dashboard_frame.winfo_ismapped():
                 qr_frame.pack_forget()
                 dashboard_frame.pack(expand=True, fill="both")
-            update_dashboard(tournament)
-        root.after(500, poll_updates)
+            
+            _update_in_progress = True
+            try:
+                update_dashboard(tournament)
+            finally:
+                _update_in_progress = False
+        
+        root.after(1000, poll_updates)  # Reducido de 500ms a 1000ms
 
-    poll_updates()
+    # Iniciar polling después de que la interfaz esté lista
+    root.after(1000, poll_updates)
     root.mainloop()
 
 
