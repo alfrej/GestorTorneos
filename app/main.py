@@ -6,7 +6,7 @@ import threading
 import tkinter as tk
 from datetime import datetime
 
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw
 import qrcode
 from flask import Flask, jsonify, render_template, request
 
@@ -125,6 +125,82 @@ def create_qr_image(data, size=420):
         (size, size)
     )
     return ImageTk.PhotoImage(img)
+
+
+def create_trophy_icon(size=32):
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    gold = (234, 188, 42, 255)
+    gold_dark = (188, 140, 24, 255)
+    base = (90, 76, 60, 255)
+    base_dark = (70, 58, 46, 255)
+
+    cup_top = int(size * 0.18)
+    cup_bottom = int(size * 0.56)
+    cup_left = int(size * 0.22)
+    cup_right = int(size * 0.78)
+    cup_inset = int(size * 0.08)
+
+    draw.polygon(
+        [
+            (cup_left, cup_top),
+            (cup_right, cup_top),
+            (cup_right - cup_inset, cup_bottom),
+            (cup_left + cup_inset, cup_bottom),
+        ],
+        fill=gold,
+    )
+    rim_height = max(1, int(size * 0.07))
+    draw.rectangle(
+        [cup_left, cup_top, cup_right, cup_top + rim_height], fill=gold_dark
+    )
+
+    handle_w = max(1, int(size * 0.12))
+    handle_h = max(1, int(size * 0.22))
+    handle_y = cup_top + int(size * 0.05)
+    draw.rectangle(
+        [cup_left - handle_w, handle_y, cup_left, handle_y + handle_h], fill=gold
+    )
+    draw.rectangle(
+        [cup_right, handle_y, cup_right + handle_w, handle_y + handle_h], fill=gold
+    )
+
+    stem_top = cup_bottom
+    stem_bottom = int(size * 0.70)
+    stem_w = max(1, int(size * 0.16))
+    stem_left = (size - stem_w) // 2
+    draw.rectangle(
+        [stem_left, stem_top, stem_left + stem_w, stem_bottom], fill=gold_dark
+    )
+
+    base_top = stem_bottom
+    base_bottom = int(size * 0.84)
+    base_w = max(1, int(size * 0.50))
+    base_left = (size - base_w) // 2
+    draw.rectangle(
+        [base_left, base_top, base_left + base_w, base_bottom], fill=base
+    )
+
+    foot_top = base_bottom
+    foot_bottom = int(size * 0.94)
+    foot_w = max(1, int(size * 0.70))
+    foot_left = (size - foot_w) // 2
+    draw.rectangle(
+        [foot_left, foot_top, foot_left + foot_w, foot_bottom], fill=base_dark
+    )
+
+    return img
+
+
+def set_window_icon(root):
+    try:
+        icon_image = create_trophy_icon(32)
+        icon_photo = ImageTk.PhotoImage(icon_image)
+        root.iconphoto(True, icon_photo)
+        root._window_icon = icon_photo
+    except tk.TclError:
+        pass
 
 def start_web_server():
     app = Flask(__name__, template_folder="web/templates")
@@ -319,6 +395,7 @@ def start_gui():
 
     root = tk.Tk()
     root.title("Gestor de Torneos")
+    set_window_icon(root)
     root.configure(bg=BG_MAIN)
     root.attributes("-fullscreen", True)
 
