@@ -1,0 +1,37 @@
+{
+  "id": "Hola que",
+  "name": "Hola que",
+  "rounds_count": 1,
+  "courts": 1,
+  "players": [
+    "1",
+    "2",
+    "3",
+    "4"
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "4",
+              "3"
+            ],
+            [
+              "1",
+              "2"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": []
+    }
+  ]
+}

@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clasificacion</title>
+    <style>
+      :root {
+        --bg: #f2f0ea;
+        --accent: #1f4e5f;
+        --accent-dark: #153844;
+        --card: #ffffff;
+        --shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Georgia", "Times New Roman", serif;
+        background: radial-gradient(circle at top, #fff8e8 0%, var(--bg) 45%);
+        display: flex;
+        justify-content: center;
+        color: #1b1b1b;
+      }
+      .page {
+        width: min(860px, 94vw);
+        padding: 36px 0 60px;
+      }
+      h1 {
+        margin: 8px 0 20px;
+        font-size: clamp(24px, 4vw, 36px);
+        letter-spacing: 1px;
+        line-height: 1.1;
+        text-align: center;
+      }
+      .tournament-name {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 40px);
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        text-align: center;
+        color: #33454d;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .header {
+        display: grid;
+        grid-template-columns: 48px 1fr 48px;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        text-decoration: none;
+        background: var(--accent);
+        color: #fff;
+        font-size: 18px;
+        line-height: 1;
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+      .nav-btn:hover {
+        transform: translateY(-2px);
+        background: var(--accent-dark);
+      }
+      .nav-btn:active {
+        transform: translateY(1px);
+      }
+      .card {
+        background: var(--card);
+        padding: 28px 34px;
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .table th,
+      .table td {
+        padding: 12px 10px;
+        text-align: center;
+        border-bottom: 1px solid #ebe6dc;
+      }
+      .table th {
+        font-size: 16px;
+        letter-spacing: 0.4px;
+      }
+      .table td.name,
+      .table th.name {
+        text-align: left;
+        font-weight: 600;
+      }
+      .empty {
+        font-size: 16px;
+        color: #4b4b4b;
+      }
+      @media (max-width: 600px) {
+        .page {
+          padding: 24px 0 48px;
+        }
+        .card {
+          padding: 22px 20px;
+        }
+        .table th,
+        .table td {
+          padding: 10px 6px;
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="header">
+        <a class="nav-btn" href="/" aria-label="Inicio">🏠</a>
+        <div class="tournament-name">{{ tournament.name }}</div>
+        <a class="nav-btn" id="back-link" href="/" aria-label="Rondas">📅</a>
+      </div>
+      <h1>Clasificacion</h1>
+      <div id="ranking" class="card"></div>
+    </main>
+    <script>
+      const tournament = {{ tournament | tojson }};
+      const rankingRoot = document.getElementById("ranking");
+      const backLink = document.getElementById("back-link");
+
+      function redirectHome() {
+        window.location.replace("/");
+      }
+
+      function watchServer() {
+        fetch("/api/ping", { cache: "no-store" })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("offline");
+            }
+          })
+          .catch(() => {
+            redirectHome();
+          });
+      }
+
+      function computePlayerStats(tournamentData) {
+        const stats = {};
+        (tournamentData.players || []).forEach((player) => {
+          stats[player] = {
+            wins: 0,
+            losses: 0,
+            played: 0,
+            pointsFor: 0,
+            pointsAgainst: 0,
+          };
+        });
+        (tournamentData.rounds || []).forEach((round) => {
+          (round.matches || []).forEach((match) => {
+            const result = match.result || {};
+            if (!Number.isInteger(result.teamA) || !Number.isInteger(result.teamB)) {
+              return;
+            }
+            const teamA = match.teams[0] || [];
+            const teamB = match.teams[1] || [];
+            const teamAWins = result.teamA > result.teamB;
+            const teamBWins = result.teamB > result.teamA;
+
+            teamA.forEach((player) => {
+              const entry = stats[player] || {
+                wins: 0,
+                losses: 0,
+                played: 0,
+                pointsFor: 0,
+                pointsAgainst: 0,
+              };
+              entry.played += 1;
+              entry.pointsFor += result.teamA;
+              entry.pointsAgainst += result.teamB;
+              if (teamAWins) {
+                entry.wins += 1;
+              } else if (teamBWins) {
+                entry.losses += 1;
+              }
+              stats[player] = entry;
+            });
+
+            teamB.forEach((player) => {
+              const entry = stats[player] || {
+                wins: 0,
+                losses: 0,
+                played: 0,
+                pointsFor: 0,
+                pointsAgainst: 0,
+              };
+              entry.played += 1;
+              entry.pointsFor += result.teamB;
+              entry.pointsAgainst += result.teamA;
+              if (teamBWins) {
+                entry.wins += 1;
+              } else if (teamAWins) {
+                entry.losses += 1;
+              }
+              stats[player] = entry;
+            });
+          });
+        });
+        return stats;
+      }
+
+      function renderRanking() {
+        if (!tournament) {
+          rankingRoot.innerHTML = '<div class="empty">No hay torneo activo.</div>';
+          return;
+        }
+
+        backLink.href = `/results/${tournament.id}`;
+        const stats = computePlayerStats(tournament);
+        const rows = Object.entries(stats).sort((a, b) => {
+          const statA = a[1];
+          const statB = b[1];
+          if (statA.wins !== statB.wins) {
+            return statB.wins - statA.wins;
+          }
+          if (statA.losses !== statB.losses) {
+            return statA.losses - statB.losses;
+          }
+          if (statA.pointsFor !== statB.pointsFor) {
+            return statB.pointsFor - statA.pointsFor;
+          }
+          if (statA.pointsAgainst !== statB.pointsAgainst) {
+            return statA.pointsAgainst - statB.pointsAgainst;
+          }
+          return a[0].localeCompare(b[0], "es");
+        });
+
+        const table = document.createElement("table");
+        table.className = "table";
+        const head = document.createElement("thead");
+        head.innerHTML = `
+          <tr>
+            <th>#</th>
+            <th class="name">Jugador</th>
+            <th>PG</th>
+            <th>PP</th>
+            <th>PJ</th>
+            <th>PF</th>
+            <th>PC</th>
+          </tr>
+        `;
+        table.appendChild(head);
+
+        const body = document.createElement("tbody");
+        rows.forEach(([player, stat], index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td class="name">${player}</td>
+            <td>${stat.wins}</td>
+            <td>${stat.losses}</td>
+            <td>${stat.played}</td>
+            <td>${stat.pointsFor}</td>
+            <td>${stat.pointsAgainst}</td>
+          `;
+          body.appendChild(row);
+        });
+        table.appendChild(body);
+
+        rankingRoot.innerHTML = "";
+        rankingRoot.appendChild(table);
+      }
+
+      renderRanking();
+      watchServer();
+      setInterval(watchServer, 5000);
+    </script>
+  </body>
+</html>

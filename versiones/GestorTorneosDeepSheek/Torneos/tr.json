@@ -1,0 +1,1245 @@
+{
+  "id": "tr",
+  "name": "tr",
+  "rounds_count": 20,
+  "courts": 3,
+  "players": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "11",
+    "22",
+    "33",
+    "44",
+    "55",
+    "66"
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "2",
+              "11"
+            ],
+            [
+              "1",
+              "9"
+            ]
+          ],
+          "result": {
+            "teamA": 0,
+            "teamB": 1
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "3",
+              "22"
+            ],
+            [
+              "4",
+              "6"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "5",
+              "33"
+            ],
+            [
+              "7",
+              "66"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "44",
+        "55",
+        "8"
+      ]
+    },
+    {
+      "index": 1,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "3",
+              "2"
+            ],
+            [
+              "6",
+              "5"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "4",
+              "1"
+            ],
+            [
+              "8",
+              "7"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "9",
+              "22"
+            ],
+            [
+              "55",
+              "44"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "11",
+        "33",
+        "66"
+      ]
+    },
+    {
+      "index": 2,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "22",
+              "33"
+            ],
+            [
+              "2",
+              "9"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "11",
+              "66"
+            ],
+            [
+              "44",
+              "7"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "5",
+              "55"
+            ],
+            [
+              "1",
+              "8"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "3",
+        "6",
+        "4"
+      ]
+    },
+    {
+      "index": 3,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "55",
+              "22"
+            ],
+            [
+              "66",
+              "6"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "8",
+              "3"
+            ],
+            [
+              "44",
+              "11"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "33",
+              "9"
+            ],
+            [
+              "5",
+              "4"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "1",
+        "7",
+        "2"
+      ]
+    },
+    {
+      "index": 4,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "7",
+              "5"
+            ],
+            [
+              "9",
+              "6"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "22",
+              "11"
+            ],
+            [
+              "33",
+              "8"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "55",
+              "4"
+            ],
+            [
+              "2",
+              "44"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "66",
+        "1",
+        "3"
+      ]
+    },
+    {
+      "index": 5,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "11",
+              "55"
+            ],
+            [
+              "9",
+              "3"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "66",
+              "4"
+            ],
+            [
+              "2",
+              "1"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "7",
+              "33"
+            ],
+            [
+              "44",
+              "8"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "6",
+        "22",
+        "5"
+      ]
+    },
+    {
+      "index": 6,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "2",
+              "4"
+            ],
+            [
+              "3",
+              "11"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "44",
+              "1"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "22",
+              "5"
+            ],
+            [
+              "8",
+              "66"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "9",
+        "55",
+        "33"
+      ]
+    },
+    {
+      "index": 7,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "55",
+              "66"
+            ],
+            [
+              "5",
+              "2"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "44",
+              "9"
+            ],
+            [
+              "1",
+              "22"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "6",
+              "11"
+            ],
+            [
+              "33",
+              "3"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "4",
+        "7",
+        "8"
+      ]
+    },
+    {
+      "index": 8,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "1",
+              "7"
+            ],
+            [
+              "3",
+              "4"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "2",
+              "6"
+            ],
+            [
+              "5",
+              "8"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "44",
+              "66"
+            ],
+            [
+              "33",
+              "55"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "9",
+        "11",
+        "22"
+      ]
+    },
+    {
+      "index": 9,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "1",
+              "6"
+            ],
+            [
+              "5",
+              "11"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "8",
+              "9"
+            ],
+            [
+              "7",
+              "3"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "4",
+              "22"
+            ],
+            [
+              "2",
+              "33"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "44",
+        "55",
+        "66"
+      ]
+    },
+    {
+      "index": 10,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "55",
+              "6"
+            ],
+            [
+              "11",
+              "1"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "44",
+              "5"
+            ],
+            [
+              "66",
+              "9"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "7",
+              "2"
+            ],
+            [
+              "8",
+              "4"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "3",
+        "22",
+        "33"
+      ]
+    },
+    {
+      "index": 11,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "4",
+              "9"
+            ],
+            [
+              "11",
+              "33"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "22",
+              "44"
+            ],
+            [
+              "66",
+              "2"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "1",
+              "55"
+            ],
+            [
+              "3",
+              "6"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "5",
+        "7",
+        "8"
+      ]
+    },
+    {
+      "index": 12,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "3",
+              "5"
+            ],
+            [
+              "44",
+              "6"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "22",
+              "7"
+            ],
+            [
+              "9",
+              "11"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "55",
+              "8"
+            ],
+            [
+              "33",
+              "66"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "2",
+        "4",
+        "1"
+      ]
+    },
+    {
+      "index": 13,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "3",
+              "55"
+            ],
+            [
+              "33",
+              "2"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "4",
+              "1"
+            ],
+            [
+              "5",
+              "66"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "8",
+              "22"
+            ],
+            [
+              "7",
+              "44"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "6",
+        "11",
+        "9"
+      ]
+    },
+    {
+      "index": 14,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "22",
+              "2"
+            ],
+            [
+              "5",
+              "9"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "6",
+              "8"
+            ],
+            [
+              "7",
+              "11"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "4",
+              "33"
+            ],
+            [
+              "3",
+              "1"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "66",
+        "55",
+        "44"
+      ]
+    },
+    {
+      "index": 15,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "4",
+              "7"
+            ],
+            [
+              "22",
+              "1"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "9",
+              "33"
+            ],
+            [
+              "11",
+              "8"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "55",
+              "44"
+            ],
+            [
+              "66",
+              "3"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "2",
+        "6",
+        "5"
+      ]
+    },
+    {
+      "index": 16,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "5",
+              "6"
+            ],
+            [
+              "44",
+              "3"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "7",
+              "55"
+            ],
+            [
+              "8",
+              "2"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "1",
+              "66"
+            ],
+            [
+              "4",
+              "11"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "22",
+        "9",
+        "33"
+      ]
+    },
+    {
+      "index": 17,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "2",
+              "55"
+            ],
+            [
+              "11",
+              "44"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "5",
+              "1"
+            ],
+            [
+              "22",
+              "66"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "9",
+              "4"
+            ],
+            [
+              "6",
+              "33"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "7",
+        "3",
+        "8"
+      ]
+    },
+    {
+      "index": 18,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "11",
+              "6"
+            ],
+            [
+              "3",
+              "66"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "33",
+              "44"
+            ],
+            [
+              "55",
+              "9"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "5",
+              "7"
+            ],
+            [
+              "22",
+              "8"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "2",
+        "4",
+        "1"
+      ]
+    },
+    {
+      "index": 19,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "33",
+              "1"
+            ],
+            [
+              "11",
+              "2"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "9",
+              "3"
+            ],
+            [
+              "4",
+              "8"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 2,
+          "teams": [
+            [
+              "22",
+              "6"
+            ],
+            [
+              "66",
+              "44"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "55",
+        "5",
+        "7"
+      ]
+    }
+  ]
+}

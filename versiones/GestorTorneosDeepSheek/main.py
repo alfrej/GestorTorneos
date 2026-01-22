@@ -40,23 +40,18 @@ ROW_ALT_2 = "#F1F3F5"
 FOCUS_BORDER = "#FD7E14"
 ROUND_HEADER_BG = "#F8F9FA"
 TABLE_HEADER_BG = "#F1F3F5"
-TABLE_HEADER_TEXT = "#000000"
+TABLE_HEADER_TEXT = "#495057"
 TEAM_A_TEXT = "#0D6EFD"
 TEAM_B_TEXT = "#DC3545"
 SUCCESS_COLOR = "#20C997"
 WARNING_COLOR = "#FFC107"
 DANGER_COLOR = "#DC3545"
 
-# Sombras sutiles
-SHADOW_1 = "0 2px 4px rgba(0,0,0,0.05)"
-SHADOW_2 = "0 4px 6px rgba(0,0,0,0.07)"
-SHADOW_3 = "0 10px 15px rgba(0,0,0,0.1)"
-
 # Tipografía mejorada
 FONT_FAMILY = "Segoe UI"
 FONT_TITLE = (FONT_FAMILY, 36, "bold")
 FONT_SUBTITLE = (FONT_FAMILY, 16)
-FONT_URL = (FONT_FAMILY, 13)
+FONT_URL = (FONT_FAMILY, 15, "bold")
 FONT_VERSION = (FONT_FAMILY, 10)
 FONT_TOURNAMENT = (FONT_FAMILY, 42, "bold")
 FONT_SECTION = (FONT_FAMILY, 24, "bold")
@@ -68,8 +63,6 @@ FONT_BENCH = (FONT_FAMILY, 15, "italic")
 FONT_TABLE_HEADER = (FONT_FAMILY, 16, "bold")
 FONT_TABLE = (FONT_FAMILY, 15)
 FONT_LEGEND = (FONT_FAMILY, 12)
-DASHBOARD_LOGO_SIZE = 96
-DASHBOARD_LOGO_PADX = 20
 
 def set_current_tournament(data):
     with _state_lock:
@@ -333,7 +326,7 @@ def start_gui():
     container.pack(expand=True, fill="both")
 
     # ============================
-    # PANTALLA QR - MEJORADA
+    # PANTALLA QR - SIN ICONOS
     # ============================
     qr_frame = tk.Frame(container, bg=BG_MAIN)
     qr_frame.pack(expand=True)
@@ -346,13 +339,11 @@ def start_gui():
     if os.path.exists(logo_path):
         logo_image = Image.open(logo_path)
         logo_photo = ImageTk.PhotoImage(logo_image.resize((200, 200)))
-        dashboard_logo_photo = ImageTk.PhotoImage(
-            logo_image.resize((DASHBOARD_LOGO_SIZE, DASHBOARD_LOGO_SIZE))
-        )
+        dashboard_logo_photo = ImageTk.PhotoImage(logo_image.resize((64, 64)))
         logo_label = tk.Label(container, image=logo_photo, bg=BG_MAIN)
         logo_label.image = logo_photo
 
-    # Título mejorado
+    # Título sin icono
     title_container = tk.Frame(qr_frame, bg=BG_MAIN)
     title_container.pack(pady=(0, 30))
     
@@ -391,30 +382,48 @@ def start_gui():
     qr_label.image = qr_image
     qr_label.pack(padx=20, pady=20)
 
-    # URL con estilo moderno
+    # URL con estilo moderno sin icono
     url_container = tk.Frame(qr_frame, bg=BG_MAIN)
     url_container.pack(pady=(20, 0))
     
-    url_label = tk.Label(
+    tk.Label(
         url_container,
-        text=url,
-        font=FONT_URL,
+        text="Accede desde:",
+        font=FONT_SUBTITLE,
         bg=BG_MAIN,
         fg=TEXT_MUTED,
+    ).pack(side="left")
+    
+    url_display = tk.Frame(
+        url_container,
+        bg=ACCENT_LIGHT,
+        highlightbackground=BORDER,
+        highlightthickness=1,
     )
-    url_label.pack()
+    url_display.pack(side="left", padx=(10, 0))
+    
+    tk.Label(
+        url_display,
+        text=url,
+        font=FONT_URL,
+        bg=ACCENT_LIGHT,
+        fg=ACCENT_DARK,
+        padx=16,
+        pady=8,
+        cursor="hand2",
+    ).pack()
     
     def open_url(event):
         import webbrowser
         webbrowser.open(url)
     
-    url_label.bind("<Button-1>", open_url)
+    url_display.bind("<Button-1>", open_url)
 
     # Logo en esquina
     if logo_label is not None:
         logo_label.place(relx=1.0, rely=1.0, anchor="se", x=-20, y=-20)
 
-    # Versión con estilo
+    # Versión sin icono
     version_container = tk.Frame(container, bg=BG_MAIN)
     version_container.place(relx=0.0, rely=1.0, anchor="sw", x=20, y=-10)
     
@@ -427,7 +436,7 @@ def start_gui():
     ).pack(side="left", padx=(4, 0))
 
     # ============================
-    # DASHBOARD - MEJORADO
+    # DASHBOARD - SIN ICONOS EN TÍTULOS
     # ============================
     dashboard_frame = tk.Frame(container, bg=BG_MAIN)
     dashboard_frame.pack_forget()
@@ -436,15 +445,10 @@ def start_gui():
     header_frame = tk.Frame(dashboard_frame, bg=BG_MAIN)
     header_frame.pack(fill="x", pady=(20, 10))
     
-    # Logo en header
+    # Logo pequeño en header
     if dashboard_logo_photo is not None:
-        spacer_width = DASHBOARD_LOGO_SIZE + (DASHBOARD_LOGO_PADX * 2)
-        left_spacer = tk.Frame(header_frame, bg=BG_MAIN, width=spacer_width)
-        left_spacer.pack(side="left")
-        left_spacer.pack_propagate(False)
-
         logo_container = tk.Frame(header_frame, bg=BG_MAIN)
-        logo_container.pack(side="right", padx=DASHBOARD_LOGO_PADX)
+        logo_container.pack(side="right", padx=20)
         tk.Label(
             logo_container,
             image=dashboard_logo_photo,
@@ -457,9 +461,8 @@ def start_gui():
         font=FONT_TOURNAMENT,
         bg=BG_MAIN,
         fg=TEXT_COLOR,
-        anchor="center",
     )
-    tournament_title.pack(side="left", fill="x", expand=True)
+    tournament_title.pack(side="left", padx=40)
 
     # Paneles principales con mejor distribución
     panels = tk.Frame(dashboard_frame, bg=BG_MAIN)
@@ -468,7 +471,7 @@ def start_gui():
     panels.grid_columnconfigure(1, weight=7, uniform="panels")
     panels.grid_rowconfigure(0, weight=1)
 
-    # Panel de Rondas
+    # Panel de Rondas - sin icono
     rounds_panel = tk.Frame(panels, bg=BG_MAIN)
     rounds_panel.grid(row=0, column=0, sticky="nsew", padx=(0, 20))
     
@@ -483,7 +486,7 @@ def start_gui():
         fg=TEXT_COLOR,
     ).pack(side="left")
 
-    # Panel de Clasificación
+    # Panel de Clasificación - sin icono
     scoreboard_panel = tk.Frame(panels, bg=BG_MAIN)
     scoreboard_panel.grid(row=0, column=1, sticky="nsew", padx=(20, 0))
     
@@ -553,16 +556,16 @@ def start_gui():
     rounds_card = build_scrollable_card(rounds_panel)
     scoreboard_card = build_scrollable_card(scoreboard_panel)
 
-    # Leyenda mejorada
+    # Leyenda mejorada sin iconos
     legend_frame = tk.Frame(scoreboard_panel, bg=BG_MAIN)
     legend_frame.pack(fill="x", pady=(12, 0))
     
     legend_items = [
-        ("PG", "Partidos ganados", TABLE_HEADER_TEXT),
-        ("PP", "Partidos perdidos", TABLE_HEADER_TEXT),
-        ("PJ", "Partidos jugados", TABLE_HEADER_TEXT),
-        ("PF", "Puntos a favor", TABLE_HEADER_TEXT),
-        ("PC", "Puntos en contra", TABLE_HEADER_TEXT),
+        ("PG", "Partidos ganados", SUCCESS_COLOR),
+        ("PP", "Partidos perdidos", DANGER_COLOR),
+        ("PJ", "Partidos jugados", TEXT_MUTED),
+        ("PF", "Puntos a favor", ACCENT),
+        ("PC", "Puntos en contra", WARNING_COLOR),
     ]
     
     for i, (abbr, desc, color) in enumerate(legend_items):
@@ -582,7 +585,7 @@ def start_gui():
             text=f"={desc}",
             font=FONT_LEGEND,
             bg=BG_MAIN,
-            fg=TABLE_HEADER_TEXT,
+            fg=TEXT_MUTED,
         ).pack(side="left", padx=(4, 0))
 
     # ============================
@@ -666,7 +669,7 @@ def start_gui():
             
             tk.Label(
                 empty_state,
-                text="📭 No hay rondas programadas",
+                text="No hay rondas programadas",
                 font=("Segoe UI", 18),
                 bg=CARD_BG,
                 fg=TEXT_MUTED,
@@ -714,7 +717,7 @@ def start_gui():
             )
             round_card.pack(fill="x")
 
-            # Header de la ronda
+            # Header de la ronda sin icono
             round_header_bg = ACCENT_LIGHT if is_active else ROUND_HEADER_BG
             round_header = tk.Frame(
                 round_card,
@@ -722,10 +725,13 @@ def start_gui():
             )
             round_header.pack(fill="x", padx=1, pady=1)
             
-            round_status = " 🔵" if is_active else ""
+            round_status_text = f"Ronda {round_index}"
+            if is_active:
+                round_status_text = f"Ronda {round_index} (ACTUAL)"
+                
             tk.Label(
                 round_header,
-                text=f"Ronda {round_index}{round_status}",
+                text=round_status_text,
                 font=FONT_ROUND_TITLE,
                 bg=round_header_bg,
                 fg=FOCUS_BORDER if is_active else TEXT_COLOR,
@@ -832,7 +838,7 @@ def start_gui():
                     pady=6,
                 ).pack()
 
-            # Jugadores que descansan
+            # Jugadores que descansan sin icono
             bench = round_info.get("bench") or []
             if bench:
                 bench_frame = tk.Frame(content, bg=ACCENT_LIGHT)
@@ -841,7 +847,7 @@ def start_gui():
                 bench_label = "Descansa" if len(bench) == 1 else "Descansan"
                 tk.Label(
                     bench_frame,
-                    text=f"⏸️ {bench_label}: {', '.join(bench)}",
+                    text=f"{bench_label}: {', '.join(bench)}",
                     font=FONT_BENCH,
                     bg=ACCENT_LIGHT,
                     fg=ACCENT_DARK,
@@ -957,8 +963,6 @@ def start_gui():
                         text_color = TEXT_MUTED  # Plata
                     elif row_index == 3:
                         text_color = "#DC3545"  # Bronce
-
-                text_color = TABLE_HEADER_TEXT
                 
                 cell_frame = tk.Frame(
                     scoreboard_card,

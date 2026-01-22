@@ -1,0 +1,140 @@
+{
+  "id": "pocos",
+  "name": "Pocos",
+  "rounds_count": 5,
+  "courts": 1,
+  "players": [
+    "uno",
+    "dos",
+    "tres",
+    "cuatro",
+    "cinco"
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "tres",
+              "cuatro"
+            ],
+            [
+              "dos",
+              "cinco"
+            ]
+          ],
+          "result": {
+            "teamA": 1,
+            "teamB": 2
+          }
+        }
+      ],
+      "bench": [
+        "uno"
+      ]
+    },
+    {
+      "index": 1,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "uno",
+              "tres"
+            ],
+            [
+              "dos",
+              "cuatro"
+            ]
+          ],
+          "result": {
+            "teamA": 2,
+            "teamB": 3
+          }
+        }
+      ],
+      "bench": [
+        "cinco"
+      ]
+    },
+    {
+      "index": 2,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "cuatro",
+              "uno"
+            ],
+            [
+              "cinco",
+              "tres"
+            ]
+          ],
+          "result": {
+            "teamA": 4,
+            "teamB": 5
+          }
+        }
+      ],
+      "bench": [
+        "dos"
+      ]
+    },
+    {
+      "index": 3,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "cinco",
+              "cuatro"
+            ],
+            [
+              "uno",
+              "dos"
+            ]
+          ],
+          "result": {
+            "teamA": 6,
+            "teamB": 7
+          }
+        }
+      ],
+      "bench": [
+        "tres"
+      ]
+    },
+    {
+      "index": 4,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "uno",
+              "cinco"
+            ],
+            [
+              "dos",
+              "tres"
+            ]
+          ],
+          "result": {
+            "teamA": 8,
+            "teamB": 9
+          }
+        }
+      ],
+      "bench": [
+        "cuatro"
+      ]
+    }
+  ]
+}
