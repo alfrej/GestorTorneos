@@ -171,6 +171,13 @@ def _run_main(path):
     subprocess.run([sys.executable, path], check=False)
 
 
+def _select_entrypoint(base_dir):
+    pymain = os.path.join(base_dir, "pymain.py")
+    if os.path.isfile(pymain):
+        return pymain
+    return os.path.join(base_dir, "main.py")
+
+
 def main():
     print("Buscando nueva version...")
     latest_main = os.path.join(LATEST_DIR, "main.py")
@@ -189,17 +196,17 @@ def main():
     if not latest_version:
         print("No existe latest o no tiene version, descargo la nueva version.")
         _download_latest_app(branch)
-        _run_main(os.path.join(LATEST_DIR, "main.py"))
+        _run_main(_select_entrypoint(LATEST_DIR))
         return
 
     if _is_remote_newer(remote_version, latest_version):
         print(f"Descargo la nueva version {remote_version} desde {branch}...")
         _download_latest_app(branch)
-        _run_main(os.path.join(LATEST_DIR, "main.py"))
+        _run_main(_select_entrypoint(LATEST_DIR))
         return
 
     print("Ya esta actualizada.")
-    _run_main(latest_main)
+    _run_main(_select_entrypoint(LATEST_DIR))
 
 
 if __name__ == "__main__":

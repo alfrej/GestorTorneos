@@ -199,8 +199,8 @@
             ]
           ],
           "result": {
-            "teamA": null,
-            "teamB": null
+            "teamA": 2,
+            "teamB": 1
           }
         },
         {
@@ -216,8 +216,8 @@
             ]
           ],
           "result": {
-            "teamA": null,
-            "teamB": null
+            "teamA": 9,
+            "teamB": 11
           }
         }
       ],

@@ -1,0 +1,103 @@
+{
+  "id": "Ghuui",
+  "name": "Ghuui",
+  "rounds_count": 2,
+  "courts": 2,
+  "players": [
+    "Ghs",
+    "Frfr",
+    "Trrr",
+    "Gg3efh",
+    "Ergh",
+    "Egght",
+    "Fggtr",
+    "Hgrr",
+    "Hgr"
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "Frfr",
+              "Gg3efh"
+            ],
+            [
+              "Hgr",
+              "Hgrr"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "Ghs",
+              "Fggtr"
+            ],
+            [
+              "Ergh",
+              "Egght"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "Trrr"
+      ]
+    },
+    {
+      "index": 1,
+      "matches": [
+        {
+          "index": 0,
+          "teams": [
+            [
+              "Frfr",
+              "Ghs"
+            ],
+            [
+              "Gg3efh",
+              "Trrr"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        },
+        {
+          "index": 1,
+          "teams": [
+            [
+              "Hgr",
+              "Ergh"
+            ],
+            [
+              "Hgrr",
+              "Egght"
+            ]
+          ],
+          "result": {
+            "teamA": null,
+            "teamB": null
+          }
+        }
+      ],
+      "bench": [
+        "Fggtr"
+      ]
+    }
+  ]
+}
