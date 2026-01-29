@@ -20,7 +20,7 @@ except Exception:
 REPO_OWNER = "alfrej"
 REPO_NAME = "GestorTorneos"
 BRANCHES = ["main", "master"]
-LOCAL_APP_MAIN = os.path.join("app", "main.py")
+LOCAL_APP_PYMAIN = os.path.join("app", "pymain.py")
 LATEST_DIR = "latest"
 
 
@@ -88,13 +88,13 @@ def _fetch_url(url):
         return resp.read()
 
 
-def _get_remote_main_and_branch():
+def _get_remote_pymain_and_branch():
     candidates = []
     last_error = ""
     for branch in BRANCHES:
         text = ""
         api_url = (
-            f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/app/main.py"
+            f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/app/pymain.py"
             f"?ref={branch}"
         )
         try:
@@ -111,7 +111,7 @@ def _get_remote_main_and_branch():
             text = ""
             last_error = "No se pudo acceder a GitHub API."
         if not text:
-            url = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{branch}/app/main.py"
+            url = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{branch}/app/pymain.py"
             try:
                 text = _fetch_url(url).decode("utf-8", errors="replace")
             except Exception:
@@ -133,11 +133,11 @@ def _download_latest_app(branch):
 
     app_prefix = ""
     for name in zf.namelist():
-        if name.endswith("/app/main.py"):
-            app_prefix = name[: -len("app/main.py")]
+        if name.endswith("/app/pymain.py"):
+            app_prefix = name[: -len("app/pymain.py")]
             break
     if not app_prefix:
-        raise RuntimeError("No se encontro app/main.py en el zip del repositorio.")
+        raise RuntimeError("No se encontro app/pymain.py en el zip del repositorio.")
 
     if os.path.isdir(LATEST_DIR):
         for name in os.listdir(LATEST_DIR):
@@ -171,19 +171,31 @@ def _run_main(path):
     subprocess.run([sys.executable, path], check=False)
 
 
+def _ensure_latest_pymain():
+    if not os.path.isfile(LOCAL_APP_PYMAIN):
+        return
+    dest = os.path.join(LATEST_DIR, "pymain.py")
+    if os.path.isfile(dest):
+        return
+    try:
+        os.makedirs(LATEST_DIR, exist_ok=True)
+        shutil.copy2(LOCAL_APP_PYMAIN, dest)
+    except OSError:
+        pass
+
+
 def _select_entrypoint(base_dir):
-    pymain = os.path.join(base_dir, "pymain.py")
-    if os.path.isfile(pymain):
-        return pymain
-    return os.path.join(base_dir, "main.py")
+    if base_dir == LATEST_DIR:
+        _ensure_latest_pymain()
+    return os.path.join(base_dir, "pymain.py")
 
 
 def main():
     print("Buscando nueva version...")
-    latest_main = os.path.join(LATEST_DIR, "main.py")
-    latest_version = _extract_version(_read_text(latest_main))
-    remote_main, branch, error_detail = _get_remote_main_and_branch()
-    remote_version = _extract_version(remote_main)
+    latest_pymain = os.path.join(LATEST_DIR, "pymain.py")
+    latest_version = _extract_version(_read_text(latest_pymain))
+    remote_pymain, branch, error_detail = _get_remote_pymain_and_branch()
+    remote_version = _extract_version(remote_pymain)
 
     if not remote_version:
         print("No se pudo leer la version remota.")
