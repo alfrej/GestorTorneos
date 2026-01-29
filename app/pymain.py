@@ -1078,20 +1078,49 @@ def draw_dashboard(screen, cache, fonts, layout, state, assets, tournament):
     draw_scoreboard_panel(screen, cache, fonts, layout, state, right_rect, tournament)
 
 
+def _init_display():
+    preferred = os.environ.get("GTR_SDL_DRIVER")
+    drivers = [preferred] if preferred else []
+    drivers += [None, "directx", "windows"]
+
+    last_error = None
+    for driver in drivers:
+        if driver:
+            os.environ["SDL_VIDEODRIVER"] = driver
+        else:
+            os.environ.pop("SDL_VIDEODRIVER", None)
+        pygame.quit()
+        pygame.init()
+        try:
+            return pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        except pygame.error as exc:
+            last_error = exc
+
+    for driver in drivers:
+        if driver:
+            os.environ["SDL_VIDEODRIVER"] = driver
+        else:
+            os.environ.pop("SDL_VIDEODRIVER", None)
+        pygame.quit()
+        pygame.init()
+        try:
+            return pygame.display.set_mode((1200, 800))
+        except pygame.error as exc:
+            last_error = exc
+
+    raise RuntimeError(f"No se pudo inicializar la ventana de Pygame: {last_error}")
+
+
 def start_gui():
     ip = get_local_ip()
     url = f"http://{ip}:{WEB_PORT}"
 
-    pygame.init()
+    screen = _init_display()
     pygame.display.set_caption("Gestor de Torneos")
+    screen_w, screen_h = screen.get_size()
 
-    info = pygame.display.Info()
-    screen = pygame.display.set_mode(
-        (info.current_w, info.current_h), pygame.FULLSCREEN
-    )
-
-    scale = min(info.current_w / 1200, info.current_h / 800)
-    layout = build_layout(info.current_w, info.current_h, scale)
+    scale = min(screen_w / 1200, screen_h / 800)
+    layout = build_layout(screen_w, screen_h, scale)
     fonts = build_fonts(scale)
     cache = TextCache(fonts)
 
