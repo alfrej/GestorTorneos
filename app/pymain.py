@@ -1180,6 +1180,18 @@ def start_gui():
     pygame.quit()
 
 
+def run_headless():
+    ip = get_local_ip()
+    url = f"http://{ip}:{WEB_PORT}"
+    print("Entorno sin escritorio: GUI desactivada.")
+    print(f"Panel web disponible en: {url}")
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
+
+
 def build_layout(screen_w, screen_h, scale):
     def s(value, minimum=1):
         return max(minimum, int(round(value * scale)))
@@ -1244,7 +1256,14 @@ def load_logos(layout):
 def main():
     server_thread = threading.Thread(target=start_web_server, daemon=True)
     server_thread.start()
-    start_gui()
+    if os.environ.get("GTR_HEADLESS") == "1":
+        run_headless()
+        return
+    try:
+        start_gui()
+    except RuntimeError as exc:
+        print(str(exc))
+        run_headless()
 
 
 if __name__ == "__main__":
