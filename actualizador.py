@@ -190,6 +190,12 @@ def _select_entrypoint(base_dir):
     return os.path.join(base_dir, "pymain.py")
 
 
+def _entrypoint_exists(base_dir):
+    if base_dir == LATEST_DIR:
+        _ensure_latest_pymain()
+    return os.path.isfile(os.path.join(base_dir, "pymain.py"))
+
+
 def main():
     print("Buscando nueva version...")
     latest_pymain = os.path.join(LATEST_DIR, "pymain.py")
@@ -201,6 +207,12 @@ def main():
         print("No se pudo leer la version remota.")
         if error_detail:
             print(f"Detalle: {error_detail}")
+        if _entrypoint_exists(LATEST_DIR):
+            print("Ejecuto la version local disponible.")
+            _run_main(_select_entrypoint(LATEST_DIR))
+        elif os.path.isfile(LOCAL_APP_PYMAIN):
+            print("Ejecuto la version local disponible.")
+            _run_main(LOCAL_APP_PYMAIN)
         return
 
     print(f"La version en git es {remote_version} ({branch}).")
