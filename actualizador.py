@@ -171,15 +171,6 @@ def _run_main(path):
     subprocess.run([sys.executable, path], check=False)
 
 
-def _ensure_requirements(requirements_path):
-    if not os.path.isfile(requirements_path):
-        return
-    subprocess.run(
-        [sys.executable, "-m", "pip", "install", "-r", requirements_path],
-        check=False,
-    )
-
-
 def main():
     print("Buscando nueva version...")
     latest_main = os.path.join(LATEST_DIR, "main.py")
@@ -198,19 +189,16 @@ def main():
     if not latest_version:
         print("No existe latest o no tiene version, descargo la nueva version.")
         _download_latest_app(branch)
-        _ensure_requirements(os.path.join(LATEST_DIR, "requirements.txt"))
         _run_main(os.path.join(LATEST_DIR, "main.py"))
         return
 
     if _is_remote_newer(remote_version, latest_version):
         print(f"Descargo la nueva version {remote_version} desde {branch}...")
         _download_latest_app(branch)
-        _ensure_requirements(os.path.join(LATEST_DIR, "requirements.txt"))
         _run_main(os.path.join(LATEST_DIR, "main.py"))
         return
 
     print("Ya esta actualizada.")
-    _ensure_requirements(os.path.join(LATEST_DIR, "requirements.txt"))
     _run_main(latest_main)
 
 
