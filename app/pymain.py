@@ -2,13 +2,15 @@
 import json
 import os
 import socket
+import sys
 import threading
 import time
 
-import pygame
 from PIL import Image
 import qrcode
 from flask import Flask, jsonify, render_template, request
+
+pygame = None
 
 __version__ = "1.1.1"
 
@@ -1078,7 +1080,16 @@ def draw_dashboard(screen, cache, fonts, layout, state, assets, tournament):
     draw_scoreboard_panel(screen, cache, fonts, layout, state, right_rect, tournament)
 
 
+def _load_pygame():
+    global pygame
+    if pygame is None:
+        import pygame as _pygame
+
+        pygame = _pygame
+
+
 def _init_display():
+    _load_pygame()
     preferred = os.environ.get("GTR_SDL_DRIVER")
     drivers = [preferred] if preferred else []
     drivers += [None, "directx", "windows"]
@@ -1115,6 +1126,7 @@ def start_gui():
     ip = get_local_ip()
     url = f"http://{ip}:{WEB_PORT}"
 
+    _load_pygame()
     screen = _init_display()
     pygame.display.set_caption("Gestor de Torneos")
     screen_w, screen_h = screen.get_size()
@@ -1192,6 +1204,14 @@ def run_headless():
         pass
 
 
+def _has_display():
+    if os.environ.get("GTR_HEADLESS") == "1":
+        return False
+    if sys.platform.startswith("win") or sys.platform == "darwin":
+        return True
+    return bool(os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"))
+
+
 def build_layout(screen_w, screen_h, scale):
     def s(value, minimum=1):
         return max(minimum, int(round(value * scale)))
@@ -1256,7 +1276,7 @@ def load_logos(layout):
 def main():
     server_thread = threading.Thread(target=start_web_server, daemon=True)
     server_thread.start()
-    if os.environ.get("GTR_HEADLESS") == "1":
+    if not _has_display():
         run_headless()
         return
     try:
